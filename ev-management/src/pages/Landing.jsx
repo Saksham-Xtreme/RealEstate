@@ -3,6 +3,10 @@ import { useNavigate } from "react-router-dom";
 import "../styles/reset.css";
 import "../styles/landing.css";
 
+
+import Navbar from "../components/Navbar";
+import Hero from "../components/Hero";
+import Footer from "../components/Footer";
 // ─── CONFIG ──────────────────────────────────────────────────────────────────
 
 const API = import.meta.env.VITE_SERVER_URL || "http://localhost:8080";
@@ -166,144 +170,11 @@ function Skeleton({ style }) {
 
 // ─── NAVBAR ──────────────────────────────────────────────────────────────────
 
-function Navbar({ onNav, navigate }) {
-  return (
-    <nav className="ev-nav">
-      <a href="#" className="ev-nav-logo"
-        onClick={(e) => { e.preventDefault(); onNav("ev-hero"); }}>
-        <div className="ev-nav-mark">
-          <svg viewBox="0 0 24 24" fill="white">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-          </svg>
-        </div>
-        EV Management
-      </a>
 
-      <ul className="ev-nav-links">
-        <li><a href="#ev-hero"      onClick={(e) => { e.preventDefault(); onNav("ev-hero"); }}>Home</a></li>
-        <li><a href="#ev-societies" onClick={(e) => { e.preventDefault(); onNav("ev-societies"); }}>Societies</a></li>
-        <li><a href="#ev-how"       onClick={(e) => { e.preventDefault(); onNav("ev-how"); }}>How it works</a></li>
-      </ul>
-
-      <button className="ev-nav-btn" onClick={() => navigate("/login")}>
-        Login
-      </button>
-    </nav>
-  );
-}
 
 // ─── HERO ────────────────────────────────────────────────────────────────────
 
-function Hero({ navigate, listings, listingsLoading, listingsError }) {
-  return (
-    <section className="ev-hero" id="ev-hero">
-      <div className="ev-hero-grid">
 
-        {/* Left copy */}
-        <div>
-          <div className="ev-hero-label ev-anim-1">
-            <span className="ev-label-dot" />
-            Verified Listings Platform
-          </div>
-
-          <h1 className="ev-h1 ev-anim-2">
-            Find <span>Verified Homes</span><br />in Premium Societies
-          </h1>
-
-          <p className="ev-hero-sub ev-anim-3">
-            Only genuine listings from verified residents across top societies.
-            No brokers. No fake listings. Just homes worth your time.
-          </p>
-
-          <div className="ev-badges ev-anim-4">
-            {["No Broker Fees", "Verified Residents", "Instant Connect"].map((b) => (
-              <div className="ev-badge" key={b}>
-                <span className="ev-badge-chk" />
-                {b}
-              </div>
-            ))}
-          </div>
-
-          <button className="ev-btn ev-anim-5" onClick={() => navigate("/listings")}>
-            Get Started
-            <span className="ev-btn-arr">→</span>
-          </button>
-        </div>
-
-        {/* Right visual — hidden on mobile via CSS */}
-        <div className="ev-hero-vis ev-anim-vis">
-          <div className="ev-float ev-float-top">
-            <div className="ev-float-ico">
-              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"
-                strokeLinecap="round" strokeLinejoin="round">
-                <path d="M9 11l3 3L22 4" />
-                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
-              </svg>
-            </div>
-            <div>
-              <div className="ev-float-stat">
-                {listingsLoading ? "—" : "100"}
-                <sup style={{ fontSize: 12, color: "var(--b400)", verticalAlign: "super" }}>+</sup>
-              </div>
-              <div className="ev-float-label">Verified Properties</div>
-            </div>
-          </div>
-
-          <div className="ev-card-main">
-            <div className="ev-card-hd">
-              <div>
-                <div className="ev-card-title">Live Listings</div>
-                <div className="ev-card-sub">Updated daily</div>
-              </div>
-              <span className="ev-verified-pill">All Verified</span>
-            </div>
-
-            {listingsLoading ? (
-              [1, 2, 3].map((i) => (
-                <div className="ev-listing-row" key={i}>
-                  <Skeleton style={{ width: 40, height: 40, borderRadius: 10, flexShrink: 0 }} />
-                  <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 6 }}>
-                    <Skeleton style={{ width: "60%", height: 13 }} />
-                    <Skeleton style={{ width: "40%", height: 11 }} />
-                  </div>
-                  <Skeleton style={{ width: 48, height: 13 }} />
-                </div>
-              ))
-            ) : listingsError ? (
-              <p style={{ fontSize: 13, color: "var(--tl)", padding: "12px 0" }}>
-                Could not load listings right now.
-              </p>
-            ) : listings.length === 0 ? (
-              <p style={{ fontSize: 13, color: "var(--tl)", padding: "12px 0" }}>
-                No listings yet.
-              </p>
-            ) : (
-              listings.map((l) => (
-                <div className="ev-listing-row" key={l._id}>
-                  <div className="ev-listing-ico">🏢</div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div className="ev-listing-name">{l.title || l.name}</div>
-                    <div className="ev-listing-loc">
-                      {l.location?.city || l.city}
-                      {l.configuration?.bedrooms ? ` · ${l.configuration.bedrooms} BHK` : ""}
-                      {l.floor ? ` · Floor ${l.floor}` : ""}
-                    </div>
-                  </div>
-                  <div className="ev-listing-price">{formatPrice(l.price)}</div>
-                </div>
-              ))
-            )}
-          </div>
-
-          <div className="ev-float ev-float-bot">
-            <span className="ev-pulse" />
-            {listingsLoading ? "Loading..." : "Live listings available now"}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
 
 // ─── SOCIETIES ───────────────────────────────────────────────────────────────
 
@@ -472,21 +343,7 @@ function CTA({ navigate, onScrollTo }) {
 
 // ─── FOOTER ──────────────────────────────────────────────────────────────────
 
-function Footer() {
-  return (
-    <footer className="ev-footer">
-      <div className="ev-footer-inner">
-        <div className="ev-footer-logo">EV Management</div>
-        <ul className="ev-footer-links">
-          {["About", "Societies", "Contact", "Privacy"].map((l) => (
-            <li key={l}><a href="#">{l}</a></li>
-          ))}
-        </ul>
-        <div className="ev-footer-copy">© 2025 EV Management. All rights reserved.</div>
-      </div>
-    </footer>
-  );
-}
+
 
 // ─── LANDING PAGE ─────────────────────────────────────────────────────────────
 
@@ -504,9 +361,8 @@ export default function LandingPage() {
 
   return (
     <div style={{ background: "#ffffff", color: "#0A1628" }}>
-      <Navbar onNav={scrollTo} navigate={navigate} />
+      <Navbar onNav={scrollTo} />
       <Hero
-        navigate={navigate}
         listings={listings}
         listingsLoading={listingsLoading}
         listingsError={listingsError}

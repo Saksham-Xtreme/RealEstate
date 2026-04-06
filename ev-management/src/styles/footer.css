@@ -1,0 +1,195 @@
+/* ─── FOOTER ─────────────────────────────────────────────────────────────── */
+
+.ev-footer {
+    background: var(--td);
+    padding: var(--sp-xl) var(--sp-md);
+  }
+  
+  /* ─── INNER WRAPPER ──────────────────────────────────────────────────────── */
+  
+  .ev-footer-inner {
+    max-width: 1140px;
+    margin: 0 auto;
+  }
+  
+  /* ─── TOP SECTION (brand + link columns) ─────────────────────────────────── */
+  
+  .ev-footer-top {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-xl);
+    padding-bottom: var(--sp-xl);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  
+  /* ─── BRAND ──────────────────────────────────────────────────────────────── */
+  
+  .ev-footer-brand {}
+  
+  .ev-footer-logo {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-xs);
+    font-family: var(--font-head);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: -0.3px;
+    margin-bottom: var(--sp-sm);
+    text-decoration: none;
+  }
+  
+  .ev-footer-mark {
+    width: 26px;
+    height: 26px;
+    background: var(--b600);
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  
+  .ev-footer-mark svg {
+    width: 13px;
+    height: 13px;
+  }
+  
+  .ev-footer-tagline {
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.38);
+    line-height: 1.65;
+    max-width: 240px;
+    font-weight: 300;
+  }
+  
+  /* ─── LINK COLUMNS ───────────────────────────────────────────────────────── */
+  
+  .ev-footer-cols {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--sp-xl) var(--sp-lg);
+  }
+  
+  .ev-footer-col-title {
+    font-family: var(--font-head);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: var(--sp-sm);
+  }
+  
+  .ev-footer-col-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .ev-footer-col-links a {
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.42);
+    text-decoration: none;
+    transition: color 0.2s;
+    display: inline-block;
+  }
+  
+  .ev-footer-col-links a:hover {
+    color: rgba(255, 255, 255, 0.85);
+  }
+  
+  /* ─── BOTTOM BAR ─────────────────────────────────────────────────────────── */
+  
+  .ev-footer-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-sm);
+    padding-top: var(--sp-lg);
+    align-items: flex-start;
+  }
+  
+  .ev-footer-copy {
+    font-family: var(--font-body);
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.22);
+  }
+  
+  .ev-footer-bottom-links {
+    display: flex;
+    gap: var(--sp-lg);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .ev-footer-bottom-links a {
+    font-family: var(--font-body);
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.28);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  
+  .ev-footer-bottom-links a:hover {
+    color: rgba(255, 255, 255, 0.65);
+  }
+  
+  /* ─── RESPONSIVE ─────────────────────────────────────────────────────────── */
+  
+  @media (min-width: 600px) {
+    .ev-footer {
+      padding: var(--sp-2xl) var(--sp-lg);
+    }
+  
+    .ev-footer-cols {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  
+    .ev-footer-bottom {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+    }
+  }
+  
+  @media (min-width: 900px) {
+    .ev-footer {
+      padding: 48px var(--sp-2xl);
+    }
+  
+    .ev-footer-top {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: var(--sp-3xl);
+    }
+  
+    .ev-footer-brand {
+      flex-shrink: 0;
+    }
+  
+    .ev-footer-cols {
+      flex: 1;
+      max-width: 580px;
+    }
+  }
+  
+  @media (min-width: 1200px) {
+    .ev-footer {
+      padding: 48px 56px;
+    }
+  }
+  
+  /* ─── SAFE AREA ──────────────────────────────────────────────────────────── */
+  
+  @supports (padding: max(0px)) {
+    .ev-footer {
+      padding-bottom: max(var(--sp-xl), env(safe-area-inset-bottom));
+    }
+  }

@@ -1,0 +1,177 @@
+/* ─── NAVBAR ─────────────────────────────────────────────────────────────── */
+
+.ev-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 var(--sp-md);
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--bdr);
+  }
+  
+  /* ─── LOGO ───────────────────────────────────────────────────────────────── */
+  
+  .ev-nav-logo {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-xs);
+    text-decoration: none;
+    font-family: var(--font-head);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--b900);
+    letter-spacing: -0.3px;
+    cursor: pointer;
+    user-select: none;
+  }
+  
+  .ev-nav-mark {
+    width: 28px;
+    height: 28px;
+    background: var(--b600);
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  
+  .ev-nav-mark svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  /* ─── DESKTOP LINKS (hidden on mobile) ───────────────────────────────────── */
+  
+  .ev-nav-links {
+    display: none;
+    list-style: none;
+    gap: 32px;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .ev-nav-links a {
+    font-family: var(--font-head);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--tm);
+    text-decoration: none;
+    transition: color 0.2s;
+    padding: 4px 0;
+    position: relative;
+  }
+  
+  .ev-nav-links a:hover {
+    color: var(--b600);
+  }
+  
+  /* active underline indicator */
+  .ev-nav-links a.ev-nav-active {
+    color: var(--b600);
+  }
+  
+  .ev-nav-links a.ev-nav-active::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--b600);
+    border-radius: 2px;
+  }
+  
+  /* ─── ACTION BUTTON ──────────────────────────────────────────────────────── */
+  
+  .ev-nav-btn {
+    font-size: 13px;
+    font-weight: 600;
+    font-family: var(--font-head);
+    color: var(--b600);
+    border: 1.5px solid var(--b200);
+    padding: 6px 16px;
+    border-radius: 8px;
+    letter-spacing: 0.02em;
+    transition: all 0.2s;
+    cursor: pointer;
+    background: transparent;
+    white-space: nowrap;
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .ev-nav-btn:hover,
+  .ev-nav-btn:active {
+    background: var(--b600);
+    color: var(--white);
+    border-color: var(--b600);
+  }
+  
+  /* ─── MOBILE HAMBURGER (optional future use) ─────────────────────────────── */
+  
+  .ev-nav-hamburger {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    padding: 4px;
+  }
+  
+  .ev-nav-hamburger span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--td);
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+  
+  /* ─── RESPONSIVE ─────────────────────────────────────────────────────────── */
+  
+  @media (min-width: 600px) {
+    .ev-nav {
+      height: 60px;
+      padding: 0 var(--sp-lg);
+    }
+  }
+  
+  @media (min-width: 900px) {
+    .ev-nav {
+      height: 64px;
+      padding: 0 var(--sp-2xl);
+    }
+  
+    .ev-nav-links {
+      display: flex;
+    }
+  
+    .ev-nav-hamburger {
+      display: none;
+    }
+  }
+  
+  @media (min-width: 1200px) {
+    .ev-nav {
+      padding: 0 56px;
+    }
+  }
+  
+  /* ─── SAFE AREA ──────────────────────────────────────────────────────────── */
+  
+  @supports (padding: max(0px)) {
+    .ev-nav {
+      padding-left:  max(var(--sp-md), env(safe-area-inset-left));
+      padding-right: max(var(--sp-md), env(safe-area-inset-right));
+    }
+  }
