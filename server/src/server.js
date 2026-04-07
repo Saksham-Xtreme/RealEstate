@@ -47,6 +47,8 @@ app.use("/api/listings", require("./routes/listing.routes.js"));
 app.use("/api/activity", require("./routes/activity.routes.js"));
 app.use("/api/stats", require("./routes/stats.routes"));
 
+app.use("/api/interests", require("./routes/interest.routes"));
+
 // ─── DB CONNECTION ────────────────────────────────────
 const connectDB = async () => {
   const conn = await mongoose.connect(process.env.MONGO_URI);

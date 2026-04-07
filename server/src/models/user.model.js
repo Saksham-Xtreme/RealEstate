@@ -13,6 +13,11 @@ const userSchema = new mongoose.Schema({
   email: String,
   city: String,
 
+  password: {
+    type: String,
+    required: false // optional (OTP users won't have it)
+  },
+
   role: {
     type: String,
     enum: ["user", "employee", "owner"],

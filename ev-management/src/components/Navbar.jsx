@@ -79,7 +79,7 @@ const Navbar = ({ role = "user", onNav }) => {
       </ul>
 
       {/* ── ACTION ── */}
-      <button className="ev-nav-btn" onClick={() => navigate("/login")}>
+      <button className="ev-nav-btn" onClick={() => navigate("/auth")}>
         Login
       </button>
     </nav>

@@ -1,0 +1,295 @@
+/* ─── AUTH PAGE ──────────────────────────────────────────────────────────── */
+
+.ev-auth-page {
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    background: var(--white);
+  }
+  
+  @media (min-width: 900px) {
+    .ev-auth-page { flex-direction: row; }
+  }
+  
+  /* ─── LEFT PANEL ─────────────────────────────────────────────────────────── */
+  
+  .ev-auth-panel {
+    background: var(--b900);
+    padding: var(--sp-2xl) var(--sp-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  @media (min-width: 900px) {
+    .ev-auth-panel {
+      width: 42%;
+      min-height: 100svh;
+      padding: var(--sp-3xl) 56px;
+      position: sticky;
+      top: 0;
+      align-self: flex-start;
+      height: 100svh;
+    }
+  }
+  
+  .ev-auth-panel-inner { max-width: 380px; width: 100%; }
+  
+  .ev-auth-panel-title {
+    font-family: var(--font-head);
+    font-size: clamp(26px, 5vw, 42px);
+    font-weight: 800;
+    color: var(--white);
+    line-height: 1.12;
+    letter-spacing: -1px;
+    margin-bottom: var(--sp-md);
+  }
+  
+  .ev-auth-panel-title span { color: var(--b200); }
+  
+  .ev-auth-panel-sub {
+    font-family: var(--font-body);
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.45);
+    font-weight: 300;
+    line-height: 1.7;
+    margin-bottom: var(--sp-xl);
+    max-width: 320px;
+  }
+  
+  .ev-auth-panel-badges {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-sm);
+  }
+  
+  /* dark-bg badge overrides */
+  .ev-auth-panel .ev-badge {
+    border-color: rgba(255, 255, 255, 0.1);
+    background:   rgba(255, 255, 255, 0.06);
+    color:        rgba(255, 255, 255, 0.6);
+  }
+  .ev-auth-panel .ev-badge-chk {
+    background:   rgba(255, 255, 255, 0.08);
+    border-color: rgba(133, 183, 235, 0.4);
+  }
+  .ev-auth-panel .ev-badge-chk::after { border-color: var(--b200); }
+  
+  /* ─── RIGHT PANEL ────────────────────────────────────────────────────────── */
+  
+  .ev-auth-form-side {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--sp-2xl) var(--sp-md);
+  }
+  
+  @media (min-width: 600px) {
+    .ev-auth-form-side { padding: var(--sp-3xl) var(--sp-2xl); }
+  }
+  
+  /* ─── FORM BOX ───────────────────────────────────────────────────────────── */
+  
+  .ev-auth-box {
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  /* ─── HEADING BLOCK ──────────────────────────────────────────────────────── */
+  
+  .ev-auth-heading-block { margin-bottom: var(--sp-xl); }
+  
+  .ev-auth-title {
+    font-family: var(--font-head);
+    font-size: clamp(22px, 5vw, 28px);
+    font-weight: 800;
+    color: var(--td);
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+    margin-top: 4px;
+    line-height: 1.2;
+  }
+  
+  .ev-auth-sub {
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--tl);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+  
+  /* ─── FIELD ──────────────────────────────────────────────────────────────── */
+  
+  .ev-auth-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: var(--sp-md);
+  }
+  
+  .ev-auth-label {
+    font-family: var(--font-head);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--tm);
+    letter-spacing: 0.02em;
+  }
+  
+  .ev-auth-input {
+    font-family: var(--font-body);
+    font-size: 15px;
+    color: var(--td);
+    background: var(--white);
+    border: 1.5px solid var(--bdrS);
+    border-radius: 10px;
+    padding: 12px var(--sp-md);
+    width: 100%;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    -webkit-appearance: none;
+  }
+  
+  .ev-auth-input:focus {
+    border-color: var(--b400);
+    box-shadow: 0 0 0 3px var(--b50);
+  }
+  
+  .ev-auth-input::placeholder { color: var(--b100); }
+  
+  /* ─── PHONE ROW ──────────────────────────────────────────────────────────── */
+  
+  .ev-auth-phone-wrap {
+    display: flex;
+    align-items: stretch;
+    border: 1.5px solid var(--bdrS);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  
+  .ev-auth-phone-wrap:focus-within {
+    border-color: var(--b400);
+    box-shadow: 0 0 0 3px var(--b50);
+  }
+  
+  .ev-auth-dial {
+    font-family: var(--font-head);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--tm);
+    background: var(--off);
+    border-right: 1.5px solid var(--bdrS);
+    padding: 12px var(--sp-md);
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    letter-spacing: 0.02em;
+  }
+  
+  .ev-auth-phone-input {
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    flex: 1;
+    letter-spacing: 0.05em;
+  }
+  
+  /* ─── PASSWORD ROW ───────────────────────────────────────────────────────── */
+  
+  .ev-auth-pass-wrap {
+    display: flex;
+    align-items: stretch;
+    border: 1.5px solid var(--bdrS);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  
+  .ev-auth-pass-wrap:focus-within {
+    border-color: var(--b400);
+    box-shadow: 0 0 0 3px var(--b50);
+  }
+  
+  .ev-auth-pass-input {
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    flex: 1;
+  }
+  
+  .ev-auth-pass-toggle {
+    background: var(--off);
+    border: none;
+    border-left: 1.5px solid var(--bdrS);
+    padding: 0 var(--sp-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--tl);
+    flex-shrink: 0;
+    transition: color 0.2s, background 0.2s;
+  }
+  
+  .ev-auth-pass-toggle:hover {
+    color: var(--b600);
+    background: var(--b50);
+  }
+  
+  /* ─── SUBMIT BUTTON ──────────────────────────────────────────────────────── */
+  
+  .ev-auth-submit {
+    width: 100%;
+    margin-top: var(--sp-sm);
+    margin-bottom: var(--sp-lg);
+  }
+  
+  .ev-auth-submit:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+  
+  /* ─── ERROR ──────────────────────────────────────────────────────────────── */
+  
+  .ev-auth-err {
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: #dc2626;
+    background: #fff5f5;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    padding: 10px var(--sp-md);
+    margin-bottom: var(--sp-md);
+  }
+  
+  /* ─── SWITCHER ───────────────────────────────────────────────────────────── */
+  
+  .ev-auth-switcher {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-sm);
+    padding-top: var(--sp-lg);
+    border-top: 1px solid var(--bdr);
+  }
+  
+  .ev-auth-link {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--tl);
+    padding: 0;
+    text-align: left;
+    transition: color 0.2s;
+    line-height: 1.6;
+  }
+  
+  .ev-auth-link strong {
+    color: var(--b600);
+    font-weight: 700;
+  }
+  
+  .ev-auth-link:hover { color: var(--b600); }
