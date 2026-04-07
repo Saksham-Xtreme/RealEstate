@@ -7,10 +7,11 @@ const {
   interact,
 } = require("../controllers/activity.controller");
 
-const auth = require("../middlewares/auth.middleware");
+const { protect, authorize } = require("../middlewares/auth.middleware");
 
-router.post("/view", auth, viewListing);
-router.post("/time", auth, timeSpent);
-router.post("/interact", auth, interact);
+// 🔷 ROUTES
+router.post("/view", protect, viewListing);
+router.post("/time", protect, timeSpent);
+router.post("/interact", protect, interact);
 
 module.exports = router;

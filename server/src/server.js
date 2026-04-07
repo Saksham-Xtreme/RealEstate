@@ -32,18 +32,24 @@ app.set("io", io);
 // ─── MIDDLEWARE ───────────────────────────────────────
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://realestatefull.vercel.app"
+  "https://realestatefull.vercel.app",
+  "https://hoppscotch.io"
 ];
 
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin) return callback(null, true); // allow Postman/curl
+    // Allow server-to-server / Postman
+    if (!origin) return callback(null, true);
 
-    if (allowedOrigins.includes(origin)) {
+    // Normalize origin (remove trailing slash)
+    const normalizedOrigin = origin.replace(/\/$/, "");
+
+    if (allowedOrigins.includes(normalizedOrigin)) {
       return callback(null, true);
-    } else {
-      return callback(new Error("Not allowed by CORS"));
     }
+
+    console.log("❌ Blocked by CORS:", origin);
+    return callback(new Error("Not allowed by CORS"));
   },
   credentials: true
 }));

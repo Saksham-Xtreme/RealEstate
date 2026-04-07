@@ -7,15 +7,15 @@ const {
   getMyInterests,
 } = require("../controllers/interest.controller");
 
-const auth = require("../middlewares/auth.middleware");
+const { protect, authorize } = require("../middlewares/auth.middleware");
 
 // Add interest
-router.post("/", auth, addInterest);
+router.post("/", protect, addInterest);
 
 // Check interest
-router.get("/:listingId", auth, checkInterest);
+router.get("/:listingId", protect, checkInterest);
 
 // Get all interests
-router.get("/", auth, getMyInterests);
+router.get("/", protect, getMyInterests);
 
 module.exports = router;

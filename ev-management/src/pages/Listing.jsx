@@ -10,7 +10,7 @@ const formatPrice = (price) => {
   return `₹${Number(price).toLocaleString("en-IN")}`;
 };
 
-/* ── Skeleton ── */
+
 const SkeletonCard = () => (
   <div className="ev-skeleton-card">
     <div className="ev-skeleton-img" />
@@ -22,7 +22,7 @@ const SkeletonCard = () => (
   </div>
 );
 
-/* ── Tracking (important for your CRM) ── */
+
 const trackListingView = async (id) => {
   try {
     await fetch(`${import.meta.env.VITE_SERVER_URL}/api/track/view`, {
@@ -41,7 +41,7 @@ const Listings = () => {
   const navigate = useNavigate();
   const { listings, loading, error } = useListings();
 
-  /* ✅ Normalize once (clean & performant approach) */
+ 
   const safeListings = useMemo(() => {
     const rawData = listings?.data || listings?.listings || listings;
     return Array.isArray(rawData) ? rawData : [];

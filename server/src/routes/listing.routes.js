@@ -7,10 +7,11 @@ const {
   getListingById
 } = require("../controllers/listing.controller");
 
-const auth = require("../middlewares/auth.middleware");
+const { protect, authorize } = require("../middlewares/auth.middleware");
 
 // 🔷 ROUTES
-router.post("/", auth, createListing);
+router.post("/", protect, authorize("owner"), createListing);
+
 router.get("/", getListings);
 router.get("/:id", getListingById);
 
