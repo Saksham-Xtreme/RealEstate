@@ -9,24 +9,28 @@ const MyInterests = () => {
   useEffect(() => {
     const fetchInterests = async () => {
       try {
+        const token = localStorage.getItem("token");
+  
         const res = await fetch(
           `${import.meta.env.VITE_SERVER_URL}/api/interests`,
           {
-            credentials: "include",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           }
         );
-
+  
         const data = await res.json();
-
+  
         setListings(data.listings || []);
-
+  
       } catch (err) {
         console.error("Failed to load interests");
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchInterests();
   }, []);
 

@@ -45,12 +45,14 @@ const ListingDetail = () => {
 
   const handleInterest = async () => {
     try {
+      const token = localStorage.getItem("token");  // 👈 ADD THIS
+  
       await fetch(`${import.meta.env.VITE_SERVER_URL}/api/interests`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,   // 👈 ADD THIS
         },
-        credentials: "include",
         body: JSON.stringify({ listingId: id }),
       });
   
