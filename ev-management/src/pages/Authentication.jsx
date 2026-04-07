@@ -446,7 +446,7 @@ const Authentication = () => {
       if (!res.ok) throw new Error(data.message || "Login failed");
       localStorage.setItem("token", data.token);
       localStorage.setItem("user",  JSON.stringify(data.user));
-      navigate("/dashboard");
+      navigate("/listings");
     } catch (e) {
       setError(e.message);
     } finally {
@@ -470,7 +470,7 @@ const Authentication = () => {
       if (!res.ok) throw new Error(data.message || "Registration failed");
       localStorage.setItem("token", data.token);
       localStorage.setItem("user",  JSON.stringify(data.user));
-      navigate("/dashboard");
+      navigate("/listings");
     } catch (e) {
       setError(e.message);
     } finally {
