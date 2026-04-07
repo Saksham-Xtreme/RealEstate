@@ -99,7 +99,7 @@ const Listings = () => {
               const id = l._id || l.id;
               if (!id) return null;
 
-              const imgSrc = l.images?.[0] || l.image || null;
+              const imgSrc = l.images?.[0]?.url || l.images?.[0] || l.image || null;
 
               return (
                 <div
