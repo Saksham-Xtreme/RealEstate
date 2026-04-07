@@ -44,16 +44,20 @@ const ListingDetail = () => {
   const startTimeRef = useRef(Date.now());
 
   const handleInterest = async () => {
-    if (interested) return;
     try {
-      await fetch(`${import.meta.env.VITE_SERVER_URL}/api/track/interest`, {
+      await fetch(`${import.meta.env.VITE_SERVER_URL}/api/interests`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
         body: JSON.stringify({ listingId: id }),
       });
+  
       setInterested(true);
+  
     } catch (err) {
-      console.error("Interest tracking failed", err);
+      console.error("Interest failed", err);
     }
   };
 

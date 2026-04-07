@@ -9,13 +9,13 @@ const {
 
 const auth = require("../middlewares/auth.middleware");
 
-// POST → add interest
+// Add interest
 router.post("/", auth, addInterest);
 
-// GET → check if user interested
+// Check interest
 router.get("/:listingId", auth, checkInterest);
 
-// GET → get all interests
+// Get all interests
 router.get("/", auth, getMyInterests);
 
 module.exports = router;

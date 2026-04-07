@@ -16,7 +16,6 @@ const interestSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// 🔥 prevent duplicate interest
 interestSchema.index({ user: 1, listing: 1 }, { unique: true });
 
 module.exports = mongoose.model("Interest", interestSchema);

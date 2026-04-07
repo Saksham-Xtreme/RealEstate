@@ -10,14 +10,16 @@ const MyInterests = () => {
     const fetchInterests = async () => {
       try {
         const res = await fetch(
-          `${import.meta.env.VITE_SERVER_URL}/api/user/interests`,
+          `${import.meta.env.VITE_SERVER_URL}/api/interests`,
           {
             credentials: "include",
           }
         );
 
         const data = await res.json();
+
         setListings(data.listings || []);
+
       } catch (err) {
         console.error("Failed to load interests");
       } finally {
@@ -43,14 +45,11 @@ const MyInterests = () => {
 
         <div style={{ display: "grid", gap: 16 }}>
           {listings.map((l) => (
-            <div
-              key={l._id}
-              style={{
-                border: "1px solid #ddd",
-                padding: 12,
-                borderRadius: 8,
-              }}
-            >
+            <div key={l._id} style={{
+              border: "1px solid #ddd",
+              padding: 12,
+              borderRadius: 8,
+            }}>
               <div>{l.title}</div>
               <div>{l.location?.city}</div>
               <div>₹{l.price}</div>
