@@ -6,6 +6,8 @@ const Navbar = ({ role = "user", onNav }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const token = localStorage.getItem("token");
+  const isLoggedIn = !!token;
 
   const isActive = (path) => location.pathname === path;
 
@@ -14,6 +16,12 @@ const Navbar = ({ role = "user", onNav }) => {
     if (hash) onNav?.(hash);
     navigate(path);
     setIsMobileMenuOpen(false);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/auth");
+    window.location.reload(); // ensures clean state
   };
 
   return (
@@ -64,9 +72,15 @@ const Navbar = ({ role = "user", onNav }) => {
 
       {/* ── ACTIONS & MOBILE TOGGLE ── */}
       <div className="ev-nav-actions">
-        <button className="ev-nav-btn" onClick={() => handleNav("/auth")}>
-          Login
-        </button>
+      {isLoggedIn ? (
+            <button className="ev-nav-btn" onClick={handleLogout}>
+                Logout
+            </button>
+            ) : (
+            <button className="ev-nav-btn" onClick={() => handleNav("/auth")}>
+                Login
+            </button>
+        )}
 
         {/* ── MOBILE HAMBURGER ── */}
         <div 
