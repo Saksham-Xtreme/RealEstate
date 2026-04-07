@@ -30,9 +30,21 @@ const io = new Server(server, {
 app.set("io", io);
 
 // ─── MIDDLEWARE ───────────────────────────────────────
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://realestatefull.vercel.app"
+];
+
 app.use(cors({
-  origin: CLIENT_URL,
-  
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true); // allow Postman/curl
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true
 }));
 
