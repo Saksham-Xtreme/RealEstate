@@ -22,7 +22,7 @@ const Footer = () => {
             </Link>
             <p className="ev-footer-tagline">
               Verified real estate platform with analytics-driven insights.
-              No brokers. No fake listings.
+              Designed and Developed by Saksham Tripathi
             </p>
           </div>
 
