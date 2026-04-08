@@ -5,62 +5,70 @@ const Employee = require("../models/employee.model");
 const { getLeadsService } = require("../services/employee.service");
 
 exports.getLeads = async (req, res) => {
-  try {
-    const leads = await getLeadsService();
+    if (req.userType !== "employee") {
+        return res.status(403).json({ message: "Forbidden" });
+    }
+    try {
+        const leads = await getLeadsService();
 
-    return res.status(200).json({
-      success: true,
-      count: leads.length,
-      data: leads,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Failed to fetch leads",
-    });
-  }
+        return res.status(200).json({
+        success: true,
+        count: leads.length,
+        data: leads,
+        });
+    } catch (error) {
+        return res.status(500).json({
+        success: false,
+        message: "Failed to fetch leads",
+        });
+    }
 };
 
 
 
 exports.createEmployee = async (req, res) => {
-  try {
-    const { name, phone, email, password } = req.body;
-
-    const exists = await Employee.findOne({
-      $or: [{ phone }, { email }],
-    });
-
-    if (exists) {
-      return res.status(400).json({
-        success: false,
-        message: "Employee already exists",
-      });
+    
+    if (req.userType !== "user" || req.user.role !== "owner") {
+        return res.status(403).json({ message: "Only owner can create employee" });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    try {
+        const { name, phone, email, password } = req.body;
 
-    const employee = await Employee.create({
-      name,
-      phone,
-      email,
-      password: hashedPassword,
-      role: "employee",
-      assignedBy: req.user._id,
-    });
+        const exists = await Employee.findOne({
+        $or: [{ phone }, { email }],
+        });
 
-    res.status(201).json({
-      success: true,
-      message: "Employee created",
-      data: employee,
-    });
+        if (exists) {
+        return res.status(400).json({
+            success: false,
+            message: "Employee already exists",
+        });
+        }
 
-  } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: "Error creating employee",
-    });
-  }
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const employee = await Employee.create({
+        name,
+        phone,
+        email,
+        password: hashedPassword,
+        role: "employee",
+        assignedBy: req.user._id,
+        });
+
+        res.status(201).json({
+        success: true,
+        message: "Employee created",
+        data: employee,
+        });
+
+    } catch (err) {
+        res.status(500).json({
+        success: false,
+        message: "Error creating employee",
+        });
+    }
 };
 
 

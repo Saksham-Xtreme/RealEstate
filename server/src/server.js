@@ -54,6 +54,7 @@ app.use("/api/stats", require("./routes/stats.routes"));
 app.use("/api/interests", require("./routes/interest.routes"));
 
 app.use("/api/employee", require("./routes/employee.routes"));
+app.use("/api/owner", require("./routes/owner.routes"));
 
 // ─── DB CONNECTION ────────────────────────────────────
 const connectDB = async () => {
