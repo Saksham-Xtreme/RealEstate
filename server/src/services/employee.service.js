@@ -2,57 +2,77 @@ const User = require("../models/user.model");
 const redis = require("../config/redis");
 const { calculateLeadScore, classifyLead } = require("./leadScore");
 
-exports.getLeadsService = async () => {
+const ACTIVE_WINDOW = 5 * 60 * 1000;
+
+exports.getLeadsService = async ({ page = 1, limit = 20 } = {}) => {
   try {
-    // 1. Fetch users from Mongo
-    const users = await User.find({}, "name email phone createdAt").lean();
+    const skip = (page - 1) * limit;
+
+    const users = await User.find({}, "name email phone createdAt")
+      .skip(skip)
+      .limit(limit)
+      .lean();
 
     if (!users.length) return [];
 
-    // 2. Prepare Redis pipeline
     const pipeline = redis.pipeline();
 
     users.forEach((user) => {
       pipeline.hgetall(`user:analytics:${user._id}`);
     });
 
-    // 3. Execute pipeline
     const redisResults = await pipeline.exec();
 
-    // 4. Merge data
-    const leads = users.map((user, index) => {
-      const analytics = redisResults[index][1] || {};
+    const leads = users
+      .map((user, index) => {
+        const [err, analyticsRaw] = redisResults[index];
 
-      const timeSpent = Number(analytics.timeSpent || 0);
-      const visits = Number(analytics.visits || 0);
-      const interactions = Number(analytics.interactions || 0);
-      const lastActivity = analytics.lastActivity
-        ? new Date(Number(analytics.lastActivity))
-        : null;
+        if (err) {
+          console.error(`Redis error for user ${user._id}:`, err);
+        }
 
-      const leadScore = calculateLeadScore({
-        timeSpent,
-        visits,
-        interactions,
-      });
+        const analytics = analyticsRaw || {};
 
-      return {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
+        const timeSpent = safeNumber(analytics.timeSpent);
+        const visits = safeNumber(analytics.visits);
+        const interactions = safeNumber(analytics.interactions);
 
-        visits,
-        timeSpent,
-        interactions,
-        lastActivity,
+        // 🔴 Skip useless users
+        if (!visits && !timeSpent && !interactions) return null;
 
-        leadScore,
-        leadCategory: classifyLead(leadScore),
-      };
-    });
+        const lastActivity = analytics.lastActivity
+          ? new Date(Number(analytics.lastActivity))
+          : null;
 
-    // 5. Sort by lead score DESC
+        const leadScore = calculateLeadScore({
+          timeSpent,
+          visits,
+          interactions,
+        });
+
+        return {
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+
+          visits,
+          timeSpent,
+          interactions,
+          lastActivity,
+
+          leadScore,
+          leadCategory: classifyLead(leadScore),
+
+          isActive:
+            lastActivity &&
+            Date.now() - lastActivity.getTime() < ACTIVE_WINDOW,
+
+          engagementScore: visits ? timeSpent / visits : 0,
+        };
+      })
+      .filter(Boolean);
+
     leads.sort((a, b) => b.leadScore - a.leadScore);
 
     return leads;

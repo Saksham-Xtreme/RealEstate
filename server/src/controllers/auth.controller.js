@@ -167,14 +167,12 @@ exports.verifyOtp = async (req, res) => {
 //   }
 // };
 
-// const jwt = require("jsonwebtoken");
-// const bcrypt = require("bcryptjs");
-// const User = require("../models/user.model");
 
-// ─── SIGNUP ─────────────────
+
+
 exports.signup = async (req, res) => {
   try {
-    const { email, password, phone, name } = req.body;
+    const { email, password, phone, name, role } = req.body;
 
     if (!phone || !password) {
       return res.status(400).json({
@@ -196,15 +194,19 @@ exports.signup = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // ✅ ROLE LOGIC
+    const userRole = role === "employee" ? "employee" : "user";
+
     const user = await User.create({
       email,
       phone,
       name,
       password: hashedPassword,
+      role: userRole, // 🔥 IMPORTANT
     });
 
     const token = jwt.sign(
-      { id: user._id, role: user.role },
+      { id: user._id, role: user.role }, // already correct
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
@@ -213,14 +215,13 @@ exports.signup = async (req, res) => {
 
   } catch (err) {
     console.error("SIGNUP ERROR:", err);
-  
+
     res.status(500).json({
       success: false,
-      message: err.message,   // 🔥 add this
+      message: err.message,
     });
   }
 };
-
 
 
 exports.login = async (req, res) => {

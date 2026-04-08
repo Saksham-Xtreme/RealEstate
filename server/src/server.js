@@ -22,7 +22,7 @@ const CLIENT_URL = process.env.CLIENT_URL;
 // ─── SOCKET.IO ────────────────────────────────────────
 const io = new Server(server, {
   cors: {
-    origin: CLIENT_URL,
+    origin: true,
     credentials: true
   }
 });
@@ -31,26 +31,12 @@ app.set("io", io);
 
 // ─── MIDDLEWARE ───────────────────────────────────────
 const allowedOrigins = [
-  "http://localhost:5173",
-  "https://realestatefull.vercel.app",
-  "https://hoppscotch.io"
+  "http://localhost:5173/",
+  // "https://realestatefull.vercel.app"
 ];
 
 app.use(cors({
-  origin: function (origin, callback) {
-    // Allow server-to-server / Postman
-    if (!origin) return callback(null, true);
-
-    // Normalize origin (remove trailing slash)
-    const normalizedOrigin = origin.replace(/\/$/, "");
-
-    if (allowedOrigins.includes(normalizedOrigin)) {
-      return callback(null, true);
-    }
-
-    console.log("❌ Blocked by CORS:", origin);
-    return callback(new Error("Not allowed by CORS"));
-  },
+  origin: true,
   credentials: true
 }));
 
@@ -66,6 +52,8 @@ app.use("/api/activity", require("./routes/activity.routes.js"));
 app.use("/api/stats", require("./routes/stats.routes"));
 
 app.use("/api/interests", require("./routes/interest.routes"));
+
+app.use("/api/employee", require("./routes/employee.routes"));
 
 // ─── DB CONNECTION ────────────────────────────────────
 const connectDB = async () => {

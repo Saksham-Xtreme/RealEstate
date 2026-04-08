@@ -1,3 +1,7 @@
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+const Employee = require("../models/employee.model");
+
 const { getLeadsService } = require("../services/employee.service");
 
 exports.getLeads = async (req, res) => {
@@ -14,5 +18,92 @@ exports.getLeads = async (req, res) => {
       success: false,
       message: "Failed to fetch leads",
     });
+  }
+};
+
+
+
+exports.createEmployee = async (req, res) => {
+  try {
+    const { name, phone, email, password } = req.body;
+
+    const exists = await Employee.findOne({
+      $or: [{ phone }, { email }],
+    });
+
+    if (exists) {
+      return res.status(400).json({
+        success: false,
+        message: "Employee already exists",
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const employee = await Employee.create({
+      name,
+      phone,
+      email,
+      password: hashedPassword,
+      role: "employee",
+      assignedBy: req.user._id,
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "Employee created",
+      data: employee,
+    });
+
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Error creating employee",
+    });
+  }
+};
+
+
+
+exports.employeeLogin = async (req, res) => {
+  try {
+    const { phone, password } = req.body;
+
+    const employee = await Employee.findOne({ phone });
+
+    if (!employee) {
+      return res.status(400).json({
+        success: false,
+        message: "Employee not found",
+      });
+    }
+
+    const isMatch = await bcrypt.compare(password, employee.password);
+
+    if (!isMatch) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid credentials",
+      });
+    }
+
+    const token = jwt.sign(
+      {
+        id: employee._id,
+        role: "employee",
+        type: "employee", // 🔥 IMPORTANT
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.json({
+      success: true,
+      token,
+      employee,
+    });
+
+  } catch (err) {
+    res.status(500).json({ success: false });
   }
 };
