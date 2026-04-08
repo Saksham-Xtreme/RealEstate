@@ -2,82 +2,66 @@ const User = require("../models/user.model");
 const redis = require("../config/redis");
 const { calculateLeadScore, classifyLead } = require("./leadScore");
 
-const ACTIVE_WINDOW = 5 * 60 * 1000;
+const getLeadsService = async () => {
+  const users = await User.find({ role: "user" });
 
-exports.getLeadsService = async ({ page = 1, limit = 20 } = {}) => {
-  try {
-    const skip = (page - 1) * limit;
+  if (!users.length) return [];
 
-    const users = await User.find({}, "name email phone createdAt")
-      .skip(skip)
-      .limit(limit)
-      .lean();
+  const pipeline = redis.pipeline();
 
-    if (!users.length) return [];
+  users.forEach((user) => {
+    pipeline.hgetall(`user:analytics:${user._id}`);
+  });
 
-    const pipeline = redis.pipeline();
+  const results = await pipeline.exec();
 
-    users.forEach((user) => {
-      pipeline.hgetall(`user:analytics:${user._id}`);
-    });
+  const leads = users.map((user, i) => {
+    const data = results[i][1] || {};
 
-    const redisResults = await pipeline.exec();
+    const visits = Number(data.visits) || 0;
+    const timeSpent = Number(data.timeSpent) || 0;
+    const interactions = Number(data.interactions) || 0;
+    const lastActivity = data.lastActivity
+      ? new Date(Number(data.lastActivity))
+      : null;
 
-    const leads = users
-      .map((user, index) => {
-        const [err, analyticsRaw] = redisResults[index];
+    const leadScore =
+      (Math.min(timeSpent / 60, 10) * 3) +
+      (Math.min(visits, 10) * 3) +
+      (Math.min(interactions * 2, 10) * 4);
 
-        if (err) {
-          console.error(`Redis error for user ${user._id}:`, err);
-        }
+    let leadCategory = "LOW";
+    if (leadScore >= 60) leadCategory = "HIGH";
+    else if (leadScore >= 25) leadCategory = "MEDIUM";
 
-        const analytics = analyticsRaw || {};
+    const isActive =
+      lastActivity && Date.now() - lastActivity.getTime() < 5 * 60 * 1000;
 
-        const timeSpent = safeNumber(analytics.timeSpent);
-        const visits = safeNumber(analytics.visits);
-        const interactions = safeNumber(analytics.interactions);
+    const engagementScore = visits > 0 ? timeSpent / visits : 0;
 
-        // 🔴 Skip useless users
-        if (!visits && !timeSpent && !interactions) return null;
+    return {
+      _id: user._id,
+      email: user.email,
+      phone: user.phone,
+      visits,
+      timeSpent,
+      interactions,
+      lastActivity,
+      leadScore,
+      leadCategory,
+      isActive,
+      engagementScore,
+    };
+  });
 
-        const lastActivity = analytics.lastActivity
-          ? new Date(Number(analytics.lastActivity))
-          : null;
+  // 🔥 IMPORTANT: SORT
+  leads.sort((a, b) => b.leadScore - a.leadScore);
 
-        const leadScore = calculateLeadScore({
-          timeSpent,
-          visits,
-          interactions,
-        });
-
-        return {
-          _id: user._id,
-          name: user.name,
-          email: user.email,
-          phone: user.phone,
-
-          visits,
-          timeSpent,
-          interactions,
-          lastActivity,
-
-          leadScore,
-          leadCategory: classifyLead(leadScore),
-
-          isActive:
-            lastActivity &&
-            Date.now() - lastActivity.getTime() < ACTIVE_WINDOW,
-
-          engagementScore: visits ? timeSpent / visits : 0,
-        };
-      })
-      .filter(Boolean);
-
-    leads.sort((a, b) => b.leadScore - a.leadScore);
-
-    return leads;
-  } catch (error) {
-    console.error("GET LEADS SERVICE ERROR:", error);
-    throw error;
-  }
+  return leads;
 };
+
+module.exports = {
+  getLeadsService,
+};
+
+

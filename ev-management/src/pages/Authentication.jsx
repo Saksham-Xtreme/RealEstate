@@ -378,40 +378,48 @@
 
 // export default Authentication;
 
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/auth.css";
 
 const SERVER = import.meta.env.VITE_SERVER_URL;
 
-const Field = ({ label, type = "text", value, onChange, placeholder }) => (
-  <div className="ev-auth-field">
-    <label className="ev-auth-label">{label}</label>
-    <input
-      className="ev-auth-input"
-      type={type}
-      value={value}
-      onChange={onChange}
-      placeholder={placeholder}
-      autoComplete="off"
-    />
-  </div>
-);
-
 const Err = ({ msg }) =>
   msg ? <p className="ev-auth-err">{msg}</p> : null;
 
-/* ═══════════════════════════════════════
-   FLOWS:
-   "login"    → phone + password
-   "register" → phone + password + name/email/city
-   ═══════════════════════════════════════ */
+/* ── role config ── */
+const ROLES = [
+  {
+    key:      "user",
+    label:    "User",
+    heading:  "User Login",
+    sub:      "Sign in with your registered phone and password.",
+    endpoint: `${SERVER}/api/auth/login`,
+    redirect: (user) => "/listings",
+  },
+  {
+    key:      "owner",
+    label:    "Owner",
+    heading:  "Owner Login",
+    sub:      "Sign in to manage your properties and leads.",
+    endpoint: `${SERVER}/api/auth/login`,
+    redirect: (user) => "/owner/dashboard",
+  },
+  {
+    key:      "employee",
+    label:    "Employee",
+    heading:  "Employee Login",
+    sub:      "Sign in with your employee credentials.",
+    endpoint: `${SERVER}/api/employee/login`,
+    redirect: (user) => "/employee/home",
+  },
+];
 
 const Authentication = () => {
   const navigate = useNavigate();
 
-  const [mode,     setMode]     = useState("login");
+  const [role,     setRole]     = useState("user");
+  const [mode,     setMode]     = useState("login");   // "login" | "register"
   const [loading,  setLoading]  = useState(false);
   const [error,    setError]    = useState("");
   const [showPass, setShowPass] = useState(false);
@@ -422,31 +430,47 @@ const Authentication = () => {
   const [email,    setEmail]    = useState("");
   const [city,     setCity]     = useState("");
 
-  const reset = () => {
+  const roleCfg = ROLES.find((r) => r.key === role);
+
+  const resetForm = () => {
     setError("");
     setPhone(""); setPassword("");
     setName(""); setEmail(""); setCity("");
     setShowPass(false);
   };
 
-  const switchMode = (m) => { setMode(m); reset(); };
+  const switchRole = (r) => { setRole(r); setMode("login"); resetForm(); };
+  const switchMode = (m) => { setMode(m); resetForm(); };
 
   /* ── LOGIN ── */
   const handleLogin = async () => {
     if (phone.length !== 10) return setError("Enter a valid 10-digit phone number.");
     if (!password)           return setError("Password is required.");
     setError(""); setLoading(true);
+
     try {
-      const res  = await fetch(`${SERVER}/api/auth/login`, {
+      const body = role === "owner"
+        ? { phone, password, role: "owner" }
+        : { phone, password };
+
+      const res  = await fetch(roleCfg.endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, password }),
+        body: JSON.stringify(body),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Login failed");
+
+      /* role guard — make sure the returned role matches what was selected */
+      const returnedRole = data.user?.role || data.employee?.role;
+      if (role === "owner"    && returnedRole !== "owner")    throw new Error("Owner account not found.");
+      if (role === "employee" && returnedRole !== "employee") throw new Error("Invalid employee credentials.");
+      if (role === "user"     && returnedRole === "owner")    throw new Error("Please use Owner Login.");
+      if (role === "user"     && returnedRole === "employee") throw new Error("Please use Employee Login.");
+
       localStorage.setItem("token", data.token);
-      localStorage.setItem("user",  JSON.stringify(data.user));
-      navigate("/listings");
+      localStorage.setItem("user",  JSON.stringify(data.user || data.employee));
+      navigate(roleCfg.redirect(data.user || data.employee));
     } catch (e) {
       setError(e.message);
     } finally {
@@ -454,12 +478,13 @@ const Authentication = () => {
     }
   };
 
-  /* ── REGISTER ── */
+  /* ── REGISTER (users only) ── */
   const handleRegister = async () => {
     if (phone.length !== 10) return setError("Enter a valid 10-digit phone number.");
     if (!password)           return setError("Password is required.");
     if (!name.trim())        return setError("Name is required.");
     setError(""); setLoading(true);
+
     try {
       const res  = await fetch(`${SERVER}/api/auth/register`, {
         method: "POST",
@@ -478,7 +503,8 @@ const Authentication = () => {
     }
   };
 
-  const isLogin = mode === "login";
+  const isLogin    = mode === "login";
+  const canRegister = role === "user"; // only users self-register
 
   return (
     <div className="ev-auth-page">
@@ -497,15 +523,28 @@ const Authentication = () => {
           </div>
 
           <h2 className="ev-auth-panel-title">
-            Real estate, <br />
-            <span>simplified.</span>
+            Real estate, <br /><span>simplified.</span>
           </h2>
           <p className="ev-auth-panel-sub">
             Verified properties. Direct owner contact.
             No brokers. No fake listings.
           </p>
 
-          <div className="ev-auth-panel-badges">
+          {/* ROLE PICKER on panel */}
+          <div className="ev-auth-role-list">
+            {ROLES.map((r) => (
+              <button
+                key={r.key}
+                className={`ev-auth-role-item ${role === r.key ? "ev-auth-role-item--active" : ""}`}
+                onClick={() => switchRole(r.key)}
+              >
+                <span className="ev-auth-role-dot" />
+                {r.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="ev-auth-panel-badges" style={{ marginTop: "var(--sp-xl)" }}>
             {["Verified listings", "No broker fees", "Direct contact"].map((b) => (
               <div key={b} className="ev-badge">
                 <div className="ev-badge-chk" />
@@ -520,29 +559,45 @@ const Authentication = () => {
       <div className="ev-auth-form-side">
         <div className="ev-auth-box">
 
+          {/* ROLE TABS (mobile — shown only on small screens) */}
+          <div className="ev-auth-role-tabs">
+            {ROLES.map((r) => (
+              <button
+                key={r.key}
+                className={`ev-auth-role-tab ${role === r.key ? "ev-auth-role-tab--active" : ""}`}
+                onClick={() => switchRole(r.key)}
+              >
+                {r.label}
+              </button>
+            ))}
+          </div>
+
           {/* HEADING */}
           <div className="ev-auth-heading-block">
-            <p className="ev-sec-label">{isLogin ? "Welcome back" : "Get started"}</p>
+            <p className="ev-sec-label">
+              {isLogin ? (role === "user" ? "Welcome back" : "Team login") : "Get started"}
+            </p>
             <h1 className="ev-auth-title">
-              {isLogin ? "Sign in to your account" : "Create your account"}
+              {isLogin ? roleCfg.heading : "Create your account"}
             </h1>
             <p className="ev-auth-sub">
-              {isLogin
-                ? "Enter your registered phone number and password."
-                : "Fill in the details below to get started."}
+              {isLogin ? roleCfg.sub : "Fill in the details below to get started."}
             </p>
           </div>
 
-          {/* ── FIELDS ── */}
-
           {/* NAME (register only) */}
           {!isLogin && (
-            <Field
-              label="Full name *"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Your name"
-            />
+            <div className="ev-auth-field">
+              <label className="ev-auth-label">Full name *</label>
+              <input
+                className="ev-auth-input"
+                type="text"
+                placeholder="Your name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                autoComplete="off"
+              />
+            </div>
           )}
 
           {/* PHONE */}
@@ -580,14 +635,12 @@ const Authentication = () => {
                 tabIndex={-1}
               >
                 {showPass ? (
-                  /* eye-off */
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
                     <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
                     <line x1="1" y1="1" x2="23" y2="23" />
                   </svg>
                 ) : (
-                  /* eye */
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                     <circle cx="12" cy="12" r="3" />
@@ -600,19 +653,14 @@ const Authentication = () => {
           {/* OPTIONAL FIELDS (register only) */}
           {!isLogin && (
             <>
-              <Field
-                label="Email (optional)"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-              />
-              <Field
-                label="City (optional)"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                placeholder="e.g. Noida"
-              />
+              <div className="ev-auth-field">
+                <label className="ev-auth-label">Email (optional)</label>
+                <input className="ev-auth-input" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="off" />
+              </div>
+              <div className="ev-auth-field">
+                <label className="ev-auth-label">City (optional)</label>
+                <input className="ev-auth-input" type="text" placeholder="e.g. Noida" value={city} onChange={(e) => setCity(e.target.value)} autoComplete="off" />
+              </div>
             </>
           )}
 
@@ -631,14 +679,20 @@ const Authentication = () => {
 
           {/* SWITCHER */}
           <div className="ev-auth-switcher">
-            {isLogin ? (
+            {canRegister && isLogin && (
               <button className="ev-auth-link" onClick={() => switchMode("register")}>
                 New here? <strong>Create an account</strong>
               </button>
-            ) : (
+            )}
+            {canRegister && !isLogin && (
               <button className="ev-auth-link" onClick={() => switchMode("login")}>
                 Already have an account? <strong>Sign in</strong>
               </button>
+            )}
+            {!canRegister && (
+              <p className="ev-auth-link" style={{ cursor: "default" }}>
+                Contact your administrator to get access.
+              </p>
             )}
           </div>
 

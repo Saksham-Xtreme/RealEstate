@@ -2,7 +2,7 @@ const activityService = require("../services/activity.service");
 
 exports.viewListing = async (req, res) => {
   const { listingId } = req.body;
-  const userId = req.user.id;
+  const userId = req.user._id;
 
   const score = await activityService.trackView(userId, listingId);
 
@@ -11,7 +11,7 @@ exports.viewListing = async (req, res) => {
 
 exports.timeSpent = async (req, res) => {
   const { listingId, duration } = req.body;
-  const userId = req.user.id;
+  const userId = req.user._id;
 
   const score = await activityService.trackTime(userId, listingId, duration);
 
@@ -20,7 +20,7 @@ exports.timeSpent = async (req, res) => {
 
 exports.interact = async (req, res) => {
   const { listingId, type } = req.body;
-  const userId = req.user.id;
+  const userId = req.user._id;
 
   const score = await activityService.trackInteraction(userId, listingId, type);
 

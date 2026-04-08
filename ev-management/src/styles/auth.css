@@ -293,3 +293,95 @@
   }
   
   .ev-auth-link:hover { color: var(--b600); }
+  
+  /* ─── ROLE PICKER (left panel, desktop) ──────────────────────────────────── */
+  
+  .ev-auth-role-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  
+  .ev-auth-role-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 11px 16px;
+    font-family: var(--font-head);
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+    width: 100%;
+  }
+  
+  .ev-auth-role-item:hover {
+    background: rgba(255, 255, 255, 0.09);
+    color: rgba(255, 255, 255, 0.8);
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+  
+  .ev-auth-role-item--active {
+    background: rgba(24, 95, 165, 0.35);
+    border-color: var(--b400);
+    color: var(--white);
+  }
+  
+  .ev-auth-role-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.25);
+    flex-shrink: 0;
+    transition: background 0.2s;
+  }
+  
+  .ev-auth-role-item--active .ev-auth-role-dot {
+    background: var(--b400);
+    box-shadow: 0 0 0 3px rgba(55, 138, 221, 0.25);
+  }
+  
+  /* ─── ROLE TABS (right panel, mobile only) ───────────────────────────────── */
+  
+  .ev-auth-role-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: var(--sp-xl);
+    background: var(--off);
+    border: 1px solid var(--bdr);
+    border-radius: 10px;
+    padding: 4px;
+  }
+  
+  .ev-auth-role-tab {
+    flex: 1;
+    padding: 8px 6px;
+    border: none;
+    border-radius: 7px;
+    background: transparent;
+    font-family: var(--font-head);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--tl);
+    cursor: pointer;
+    transition: all 0.18s;
+    white-space: nowrap;
+  }
+  
+  .ev-auth-role-tab:hover { color: var(--b600); }
+  
+  .ev-auth-role-tab--active {
+    background: var(--white);
+    color: var(--b600);
+    box-shadow: 0 1px 6px rgba(24, 95, 165, 0.1);
+  }
+  
+  /* hide tabs on desktop (panel handles role picking) */
+  @media (min-width: 900px) {
+    .ev-auth-role-tabs { display: none; }
+  }
