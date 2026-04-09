@@ -5,73 +5,95 @@ const { calculateLeadScore, classifyLead } = require("../services/leadScore");
 
 // ================= DASHBOARD =================
 exports.getOwnerDashboard = async (req, res) => {
-  try {
-    const users = await User.find({}, "_id name").lean();
-    const employees = await Employee.find({}, "_id name").lean();
-
-    const pipeline = redis.pipeline();
-
-    users.forEach((u) => {
-      pipeline.hgetall(`user:analytics:${u._id}`);
-    });
-
-    employees.forEach((e) => {
-      pipeline.get(`employee:session:${e._id}`);
-    });
-
-    const results = await pipeline.exec();
-
-    const userResults = results.slice(0, users.length);
-    const employeeResults = results.slice(users.length);
-
-    let high = 0, medium = 0, low = 0;
-
-    users.forEach((user, i) => {
-      const data = userResults[i][1] || {};
-
-      const timeSpent = Number(data.timeSpent || 0);
-      const visits = Number(data.visits || 0);
-      const interactions = Number(data.interactions || 0);
-
-      const score = calculateLeadScore({
-        timeSpent,
-        visits,
-        interactions,
+    try {
+        const users = await User.find(
+            { role: "user" }, // ✅ only real users
+            "_id name role"
+        ).lean();
+      const employees = await Employee.find(
+        {},
+        "_id name email lastLogin"
+      ).lean();
+  
+      const pipeline = redis.pipeline();
+  
+      users.forEach((u) => {
+        pipeline.hgetall(`user:analytics:${u._id}`);
       });
-
-      if (score > 80) high++;
-      else if (score > 40) medium++;
-      else low++;
-    });
-
-    let activeEmployees = 0;
-
-    employeeResults.forEach(([_, val]) => {
-      if (val) activeEmployees++;
-    });
-
-    res.json({
-      success: true,
-      data: {
-        users: {
-          total: users.length,
-          high,
-          medium,
-          low,
+  
+      employees.forEach((e) => {
+        pipeline.get(`employee:session:${e._id}`);
+      });
+  
+      const results = await pipeline.exec();
+  
+      const userResults = results.slice(0, users.length);
+      const employeeResults = results.slice(users.length);
+  
+      let high = 0, medium = 0, low = 0;
+  
+      const enrichedUsers = users.map((user, i) => {
+        const data = userResults[i][1] || {};
+  
+        const timeSpent = Number(data.timeSpent || 0);
+        const visits = Number(data.visits || 0);
+        const interactions = Number(data.interactions || 0);
+  
+        const score = calculateLeadScore({
+          timeSpent,
+          visits,
+          interactions,
+        });
+  
+        const category = classifyLead(score);
+  
+        if (category === "high") high++;
+        else if (category === "medium") medium++;
+        else low++;
+  
+        return {
+            name: user.name,
+            score,
+            category: classifyLead(score),
+          };
+      });
+  
+      enrichedUsers.sort((a, b) => b.score - a.score);
+  
+      const enrichedEmployees = employees.map((emp, i) => {
+        const activeTime = Number(employeeResults[i][1] || 0);
+  
+        return {
+          ...emp,
+          activeTime,
+          status: activeTime > 60 ? "Active" : "Idle",
+        };
+      });
+  
+      const activeUsers = await redis.scard("active_users");
+  
+      res.json({
+        success: true,
+        data: {
+          stats: {
+            totalUsers: users.length,
+            activeUsers,
+            totalEmployees: employees.length,
+            activeEmployees: enrichedEmployees.filter(e => e.status === "Active").length,
+            highLeads: high,
+            mediumLeads: medium,
+            lowLeads: low,
+          },
+          employees: enrichedEmployees,
+          topUsers: enrichedUsers.slice(0, 10),
         },
-        employees: {
-          total: employees.length,
-          active: activeEmployees,
-        },
-      },
-    });
-
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false });
-  }
+      });
+  
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ success: false });
+    }
 };
-
 
 
 // ================= USER INSIGHTS =================

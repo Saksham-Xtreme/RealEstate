@@ -6,6 +6,7 @@ const {
   getListings,
   getListingById,
   getMyListings,
+  updateListing,
 } = require("../controllers/listing.controller");
 
 const { protect, authorize } = require("../middlewares/auth.middleware");
@@ -33,5 +34,13 @@ router.get(
 // 🔷 PUBLIC
 router.get("/", getListings);
 router.get("/:id", getListingById);
+
+// edit
+router.put(
+  "/:id",
+  protect,
+  authorize("employee"),
+  updateListing
+);
 
 module.exports = router;

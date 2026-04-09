@@ -10,6 +10,7 @@ import Authentication from "./pages/Authentication";
 import EmployeeDashboard from "./pages/Employee/EmployeeDashboard";
 import EmployeeLayout from "./layouts/EmployeeLayout";
 import CreateListing from "./pages/Employee/CreateListing";
+import EditListing from "./pages/Employee/EditListing";
 // Owner
 import OwnerDashboard from "./pages/owner/OwnerDashboard";
 
@@ -75,7 +76,8 @@ function App() {
           }
         >
           <Route path="home" element={<EmployeeDashboard />} />
-          <Route path="create-listing" element={<CreateListing />} /> 
+          <Route path="createListing" element={<CreateListing />} /> 
+          <Route path="editListing/:id" element={<EditListing />} />
         </Route>
 
         {/* DEFAULT REDIRECT */}
