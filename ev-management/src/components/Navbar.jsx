@@ -11,7 +11,7 @@ const Navbar = ({ role = "user", onNav }) => {
 
   const isActive = (path) => location.pathname === path;
 
-  // Helper to handle navigation and close the mobile menu
+  
   const handleNav = (path, hash = null) => {
     if (hash) onNav?.(hash);
     navigate(path);
@@ -20,8 +20,12 @@ const Navbar = ({ role = "user", onNav }) => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+  
+    // optional cleanup
+    localStorage.removeItem("user");
+  
+    // navigate without reload
     navigate("/auth");
-    window.location.reload(); // ensures clean state
   };
 
   return (
