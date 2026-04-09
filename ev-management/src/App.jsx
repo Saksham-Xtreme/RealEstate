@@ -9,7 +9,7 @@ import Authentication from "./pages/Authentication";
 // Employee
 import EmployeeDashboard from "./pages/Employee/EmployeeDashboard";
 import EmployeeLayout from "./layouts/EmployeeLayout";
-
+import CreateListing from "./pages/Employee/CreateListing";
 // Owner
 import OwnerDashboard from "./pages/owner/OwnerDashboard";
 
@@ -75,6 +75,7 @@ function App() {
           }
         >
           <Route path="home" element={<EmployeeDashboard />} />
+          <Route path="create-listing" element={<CreateListing />} /> 
         </Route>
 
         {/* DEFAULT REDIRECT */}

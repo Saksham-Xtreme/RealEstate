@@ -86,3 +86,20 @@ exports.getMyInterests = async (req, res) => {
     res.status(500).json({ success: false });
   }
 };
+
+exports.getMyListings = async (req, res) => {
+    try {
+      const listings = await Listing.find({
+        createdBy: req.user.id
+      }).sort({ createdAt: -1 });
+  
+      res.json({
+        success: true,
+        data: listings
+      });
+  
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ success: false });
+    }
+};

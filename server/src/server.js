@@ -46,6 +46,7 @@ cron.schedule("*/10 * * * *", syncAnalytics);
 
 app.use(morgan("dev"));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 
 

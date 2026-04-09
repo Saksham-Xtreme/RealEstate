@@ -1,39 +1,47 @@
 const Listing = require("../models/listing.model");
-
+const cloudinary = require("../config/cloudinary");
 
 // 🔷 CREATE LISTING
 const createListing = async (req, res) => {
   try {
-    const data = req.body;
+    const files = req.files;
 
-    if (!req.user || !req.user.id) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized"
-      });
+    let uploadedImages = [];
+
+    if (files && files.length > 0) {
+      const uploads = files.map((file) =>
+        cloudinary.uploader.upload(file.path, {
+          folder: "real-estate/listings",
+        })
+      );
+
+      const results = await Promise.all(uploads);
+
+      uploadedImages = results.map((img, index) => ({
+        url: img.secure_url,
+        publicId: img.public_id,
+        isPrimary: index === 0,
+      }));
     }
 
     const listing = await Listing.create({
-      ...data,
-      createdBy: req.user.id
+      ...req.body,
+      images: uploadedImages,
+      createdBy: req.user.id,
+      status: "active",
     });
 
-    res.status(201).json({
+    res.json({
       success: true,
-      listing
+      data: listing,
     });
-
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message
-    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false });
   }
 };
 
-
-
-// 🔷 GET ALL LISTINGS (FILTER + PAGINATION)
+// 🔷 GET ALL LISTINGS (PUBLIC)
 const getListings = async (req, res) => {
   try {
     let {
@@ -44,108 +52,95 @@ const getListings = async (req, res) => {
       bedrooms,
       page = 1,
       limit = 10,
-      sort = "latest"
+      sort = "latest",
     } = req.query;
 
-    // 🔷 SANITIZE INPUT
     page = Math.max(1, Number(page));
-    limit = Math.min(50, Number(limit)); // cap limit (important)
+    limit = Math.min(50, Number(limit));
 
-    let query = {};
+    let query = { status: "active" };
 
-    // 🔹 LOCATION FILTER
-    if (city) {
-      query["location.city"] = city;
-    }
+    if (city) query["location.city"] = city;
+    if (type) query.type = type;
+    if (bedrooms) query["configuration.bedrooms"] = Number(bedrooms);
 
-    // 🔹 TYPE FILTER
-    if (type) {
-      query.type = type;
-    }
-
-    // 🔹 BEDROOM FILTER
-    if (bedrooms) {
-      query["configuration.bedrooms"] = Number(bedrooms);
-    }
-
-    // 🔹 PRICE FILTER
     if (minPrice || maxPrice) {
       query.price = {};
       if (minPrice) query.price.$gte = Number(minPrice);
       if (maxPrice) query.price.$lte = Number(maxPrice);
     }
 
-    // 🔹 STATUS FILTER (IMPORTANT)
-    query.status = "active";
-
-    // 🔹 SORTING
     let sortOption = {};
     if (sort === "price_asc") sortOption.price = 1;
     else if (sort === "price_desc") sortOption.price = -1;
     else sortOption.createdAt = -1;
 
-    // 🔹 PAGINATION
     const skip = (page - 1) * limit;
 
     const listings = await Listing.find(query)
       .sort(sortOption)
       .skip(skip)
       .limit(limit)
-      .select("title price location images configuration");
+      .select("title price location images configuration type");
 
     const total = await Listing.countDocuments(query);
 
     res.json({
       success: true,
+      listings,
       total,
       page,
       pages: Math.ceil(total / limit),
-      listings
     });
-
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message
-    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
   }
 };
-
-
 
 // 🔷 GET SINGLE LISTING
 const getListingById = async (req, res) => {
   try {
-    const { id } = req.params;
-
-    const listing = await Listing.findById(id)
-      .populate("society", "name location");
+    const listing = await Listing.findById(req.params.id).populate(
+      "society",
+      "name location"
+    );
 
     if (!listing) {
       return res.status(404).json({
         success: false,
-        message: "Listing not found"
+        message: "Listing not found",
       });
     }
 
-    res.json({
-      success: true,
-      listing
-    });
-
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message
-    });
+    res.json({ success: true, listing });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
   }
 };
 
+// 🔷 GET EMPLOYEE LISTINGS
+const getMyListings = async (req, res) => {
+  try {
+    const listings = await Listing.find({
+      createdBy: req.user.id,
+    })
+      .sort({ createdAt: -1 })
+      .select("title price location images type");
 
+    res.json({
+      success: true,
+      data: listings,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false });
+  }
+};
 
 // 🔷 EXPORT
 module.exports = {
   createListing,
   getListings,
-  getListingById
+  getListingById,
+  getMyListings, // ✅ IMPORTANT
 };

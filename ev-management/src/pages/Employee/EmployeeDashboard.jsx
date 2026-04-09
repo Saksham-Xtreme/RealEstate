@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const SERVER = import.meta.env.VITE_SERVER_URL || "http://localhost:8080";
 
@@ -8,8 +9,11 @@ const EmployeeDashboard = () => {
   const [filter, setFilter] = useState("ALL");
   const [loading, setLoading] = useState(true);
   const [notifiedLeads, setNotifiedLeads] = useState(new Set());
+  const [listings, setListings] = useState([]);
+  const [listingCount, setListingCount] = useState(0);
 
   // 🔥 Fetch Leads
+  const navigate = useNavigate();
   const fetchLeads = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -27,10 +31,28 @@ const EmployeeDashboard = () => {
       setLoading(false);
     }
   };
+  const fetchMyListings = async () => {
+    try {
+      const token = localStorage.getItem("token");
+  
+      const res = await axios.get(`${SERVER}/api/listings/my`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      setListings(res.data.data || []);
+      setListingCount(res.data.data.length);
+  
+    } catch (err) {
+      console.error("Listing fetch error:", err);
+    }
+  };
 
   // 🔥 Polling (Live Updates)
   useEffect(() => {
     fetchLeads();
+    fetchMyListings();
 
     const interval = setInterval(fetchLeads, 5000);
 
@@ -86,6 +108,7 @@ const EmployeeDashboard = () => {
         <Card title="High" value={stats.high} color="text-red-500" />
         <Card title="Medium" value={stats.medium} color="text-yellow-500" />
         <Card title="Low" value={stats.low} color="text-green-500" />
+        <Card title="My Listings" value={listingCount} color="text-blue-500" />
       </div>
 
       {/* FILTER */}
@@ -101,6 +124,17 @@ const EmployeeDashboard = () => {
             {f}
           </button>
         ))}
+      </div>
+
+      <div className="flex justify-between items-center">
+        <h2 className="text-lg font-semibold">My Listings</h2>
+
+        <button
+          onClick={() => navigate("/employee/create-listing")}
+          className="px-4 py-2 bg-black text-white rounded-lg"
+        >
+          + Add Listing
+        </button>
       </div>
 
       {/* TABLE */}
@@ -173,7 +207,35 @@ const EmployeeDashboard = () => {
           </tbody>
         </table>
       </div>
+      
+      <div className="grid grid-cols-3 gap-4 mt-6">
+        {listings.length === 0 ? (
+          <p className="text-gray-500">No listings created</p>
+        ) : (
+          listings.map((l) => (
+            <div key={l._id} className="bg-white shadow rounded-xl overflow-hidden">
+
+              <img
+                src={l.images?.[0]?.url}
+                className="h-40 w-full object-cover"
+              />
+
+              <div className="p-3">
+                <h3 className="font-semibold">{l.title}</h3>
+                <p className="text-sm">{l.location?.city}</p>
+
+                <div className="flex justify-between mt-2">
+                  <span>₹{l.price}</span>
+                  <span>{l.type}</span>
+                </div>
+              </div>
+
+            </div>
+          ))
+        )}
+      </div>
     </div>
+    
   );
 };
 

@@ -97,7 +97,7 @@ const ListingDetail = () => {
       document.removeEventListener("visibilitychange", handleVisibility);
   }, []);
 
-  // ✅ STEP 4 — OPTIONAL (User activity detection)
+  
   useEffect(() => {
     let timeout;
 
@@ -107,7 +107,7 @@ const ListingDetail = () => {
       clearTimeout(timeout);
 
       timeout = setTimeout(() => {
-        isActiveRef.current = false; // user inactive
+        isActiveRef.current = false; 
       }, 15000); // 15 sec idle
     };
 
