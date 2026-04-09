@@ -1,26 +1,26 @@
 // models/analytics.model.js
 
 const mongoose = require("mongoose");
-
 const analyticsSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User"
+    ref: "User",
+    required: true,
+    unique: true, // 🔥 important (one doc per user)
   },
 
-  visits: Number,
-  timeSpent: Number,
-  interactions: Number,
+  visits: { type: Number, default: 0 },
+  timeSpent: { type: Number, default: 0 },
+  interactions: { type: Number, default: 0 },
 
-  leadScore: Number,
+  leadScore: { type: Number, default: 0 },
 
   societiesViewed: [String],
 
   updatedAt: {
     type: Date,
-    default: Date.now
-  }
+    default: Date.now,
+  },
 });
-
 
 module.exports = mongoose.model("Analytics", analyticsSchema);

@@ -6,10 +6,11 @@ const mongoose = require("mongoose");
 const morgan = require("morgan");
 const http = require("http");
 const { Server } = require("socket.io");
-
+const cron = require("node-cron");
 const redis = require("./config/redis");
 
 
+const syncAnalytics = require("./jobs/syncAnalytics");
 
 // ─── APP INIT ─────────────────────────────────────────
 const app = express();
@@ -40,10 +41,12 @@ app.use(cors({
   credentials: true
 }));
 
+cron.schedule("*/10 * * * *", syncAnalytics);
 
 
 app.use(morgan("dev"));
 app.use(express.json());
+
 
 
 app.use("/api/auth", require("./routes/auth.routes"));
@@ -73,6 +76,11 @@ const testRedis = async () => {
   }
 };
 
+
+app.get("/test-sync", async (req, res) => {
+  await syncAnalytics();
+  res.send("synced");
+});
 // ─── START SERVER PROPERLY ────────────────────────────
 const startServer = async () => {
   try {

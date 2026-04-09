@@ -42,16 +42,123 @@ const ListingDetail = () => {
   const [activeImg, setActiveImg] = useState(0);
 
   const startTimeRef = useRef(Date.now());
+  const isActiveRef = useRef(true); // ✅ STEP 1 — Track active/inactive state
+  const listingRef = useRef(listing); // Used to avoid stale closures in cleanup/event listeners
+
+  // ✅ STEP 3 — Modified Incremental time tracking function (CRITICAL)
+  const sendTimeUpdate = async () => {
+    try {
+      // ❌ skip if tab not active
+      if (!isActiveRef.current) return;
+
+      const token = localStorage.getItem("token");
+
+      const timeSpent = Math.floor(
+        (Date.now() - startTimeRef.current) / 1000
+      );
+
+      // ignore very small values
+      if (timeSpent < 2) return;
+
+      await fetch(`${import.meta.env.VITE_SERVER_URL}/api/activity/time`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+        body: JSON.stringify({
+          listingId: id,
+          duration: timeSpent,
+        }),
+      });
+
+      // reset timer after sending
+      startTimeRef.current = Date.now();
+
+    } catch (err) {
+      console.error("Time tracking failed");
+    }
+  };
+
+  // ✅ STEP 2 — Detect tab visibility
+  useEffect(() => {
+    const handleVisibility = () => {
+      isActiveRef.current = !document.hidden;
+
+      // reset timer when user comes back
+      if (!document.hidden) {
+        startTimeRef.current = Date.now();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    return () =>
+      document.removeEventListener("visibilitychange", handleVisibility);
+  }, []);
+
+  // ✅ STEP 4 — OPTIONAL (User activity detection)
+  useEffect(() => {
+    let timeout;
+
+    const markActive = () => {
+      isActiveRef.current = true;
+
+      clearTimeout(timeout);
+
+      timeout = setTimeout(() => {
+        isActiveRef.current = false; // user inactive
+      }, 15000); // 15 sec idle
+    };
+
+    window.addEventListener("mousemove", markActive);
+    window.addEventListener("keydown", markActive);
+    window.addEventListener("scroll", markActive);
+
+    return () => {
+      window.removeEventListener("mousemove", markActive);
+      window.removeEventListener("keydown", markActive);
+      window.removeEventListener("scroll", markActive);
+    };
+  }, []);
+
+  // Keep ref synced with latest listing data
+  useEffect(() => {
+    listingRef.current = listing;
+  }, [listing]);
+
+  // 🔥 ADD: Universal interaction tracker
+  const trackInteraction = async (type) => {
+    try {
+      const token = localStorage.getItem("token");
+      const currentListing = listingRef.current;
+
+      await fetch(`${import.meta.env.VITE_SERVER_URL}/api/activity/interact`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+        body: JSON.stringify({
+          listingId: id,
+          type, // click, image, scroll, interest
+          society: currentListing?.location?.sector || "",
+        }),
+      });
+    } catch (err) {
+      console.error("Interaction failed");
+    }
+  };
 
   const handleInterest = async () => {
     try {
-      const token = localStorage.getItem("token");  // 👈 ADD THIS
+      const token = localStorage.getItem("token");  
   
       await fetch(`${import.meta.env.VITE_SERVER_URL}/api/interests`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,   // 👈 ADD THIS
+          ...(token && { Authorization: `Bearer ${token}` }),
         },
         body: JSON.stringify({ listingId: id }),
       });
@@ -78,31 +185,70 @@ const ListingDetail = () => {
     fetchListing();
   }, [id]);
 
+  // ✅ FIX: Upgraded view tracking
   useEffect(() => {
+    // Only track enriched view once the listing data has loaded
+    if (!listing) return; 
+
     const trackView = async () => {
       try {
-        await fetch(`${import.meta.env.VITE_SERVER_URL}/api/track/view`, {
+        const token = localStorage.getItem("token");
+
+        await fetch(`${import.meta.env.VITE_SERVER_URL}/api/activity/view`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ listingId: id }),
+          headers: {
+            "Content-Type": "application/json",
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
+          body: JSON.stringify({
+            listingId: id,
+            society: listing.location?.sector || "",
+            city: listing.location?.city || "",
+            price: listing.price || 0,
+          }),
         });
       } catch (err) {
         console.error("View tracking failed");
       }
     };
     trackView();
+  }, [id, listing?._id]); // 👈 ✅ FIXED: Used listing?._id instead of listing?.id
+
+  // Periodic tracking
+  useEffect(() => {
+    const interval = setInterval(() => {
+      sendTimeUpdate();
+    }, 10000); // every 10 seconds
+
+    return () => clearInterval(interval);
   }, [id]);
 
+  // Final send on exit (Replaced sendBeacon)
   useEffect(() => {
     return () => {
-      const timeSpent = Math.floor((Date.now() - startTimeRef.current) / 1000);
-      const payload = new Blob(
-        [JSON.stringify({ listingId: id, timeSpent })],
-        { type: "application/json" }
-      );
-      navigator.sendBeacon(`${import.meta.env.VITE_SERVER_URL}/api/track/time`, payload);
+      sendTimeUpdate(); // final send on exit
     };
   }, [id]);
+
+  // 🎯 CONNECT: Scroll Tracking
+  useEffect(() => {
+    let scrollTracked = false; // Prevent multiple pings per page visit
+    
+    const handleScroll = () => {
+      // 👈 ✅ FIXED: More accurate scroll calc
+      const scrollPercent =
+        (window.scrollY /
+          (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+
+      if (scrollPercent > 50 && !scrollTracked) {
+        trackInteraction("scroll_50");
+        scrollTracked = true;
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   /* ── LOADING ── */
   if (loading) return (
@@ -199,7 +345,10 @@ const ListingDetail = () => {
                   <button
                     key={i}
                     className={`ev-ld-thumb ${i === activeImg ? "ev-ld-thumb-active" : ""}`}
-                    onClick={() => setActiveImg(i)}
+                    onClick={() => {
+                      setActiveImg(i);
+                      trackInteraction("image_click"); // 🎯 CONNECT: Image click tracking
+                    }}
                   >
                     <img src={src} alt={`View ${i + 1}`} />
                   </button>
@@ -318,7 +467,10 @@ const ListingDetail = () => {
               {/* BUTTON */}
               <button
                 className={`ev-ld-interest-btn ${interested ? "ev-ld-interest-btn--done" : ""}`}
-                onClick={handleInterest}
+                onClick={() => {
+                  trackInteraction("interest_click"); // 🎯 CONNECT: Interest click tracking
+                  handleInterest();
+                }}
                 disabled={interested}
               >
                 {interested ? "Interest Registered ✓" : "I'm Interested"}

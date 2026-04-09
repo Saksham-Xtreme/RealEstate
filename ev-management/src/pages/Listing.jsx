@@ -25,10 +25,12 @@ const SkeletonCard = () => (
 
 const trackListingView = async (id) => {
   try {
-    await fetch(`${import.meta.env.VITE_SERVER_URL}/api/track/view`, {
+    const token = localStorage.getItem("token"); // Added safely just in case the new route expects auth
+    await fetch(`${import.meta.env.VITE_SERVER_URL}/api/activity/view`, { // 👈 ✅ FIXED: Corrected tracking endpoint
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        ...(token && { Authorization: `Bearer ${token}` }),
       },
       body: JSON.stringify({ listingId: id }),
     });
