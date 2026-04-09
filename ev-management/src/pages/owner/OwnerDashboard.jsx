@@ -186,6 +186,7 @@ const OwnerDashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <TopLeads users={topUsers} />
         <EmployeeTable employees={employees} />
+        <p>This will get complete soon</p>
       </div>
 
     </div>
