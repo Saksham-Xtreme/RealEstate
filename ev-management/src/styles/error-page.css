@@ -1,0 +1,133 @@
+/* ─── ERROR PAGE ─────────────────────────────────────────────────────────── */
+
+.ev-err-page {
+    min-height: 100svh;
+    background: var(--off);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--sp-xl) var(--sp-md);
+    gap: var(--sp-xl);
+  }
+  
+  /* ── LOGO ── */
+  .ev-err-logo {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-xs);
+    font-family: var(--font-head);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--b900);
+    letter-spacing: -0.3px;
+    cursor: pointer;
+    user-select: none;
+    text-decoration: none;
+    position: absolute;
+    top: var(--sp-lg);
+    left: var(--sp-lg);
+  }
+  
+  /* ── CARD ── */
+  .ev-err-card {
+    background: var(--white);
+    border: 1px solid var(--bdr);
+    border-radius: 20px;
+    padding: var(--sp-2xl) var(--sp-xl);
+    text-align: center;
+    width: 100%;
+    max-width: 440px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sp-md);
+    box-shadow: 0 4px 32px rgba(24, 95, 165, 0.06);
+    animation: ev-fadeup 0.5s ease both;
+  }
+  
+  @keyframes ev-fadeup {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  
+  /* ── SVG ILLUSTRATION ── */
+  .ev-err-illustration {
+    width: 200px;
+    margin-bottom: var(--sp-xs);
+  }
+  
+  .ev-err-svg {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  
+  /* ── ERROR CODE ── */
+  .ev-err-code {
+    font-family: var(--font-head);
+    font-size: 72px;
+    font-weight: 800;
+    color: var(--b600);
+    letter-spacing: -4px;
+    line-height: 1;
+    margin-bottom: -8px;
+  }
+  
+  /* ── TITLE ── */
+  .ev-err-title {
+    font-family: var(--font-head);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--td);
+    letter-spacing: -0.3px;
+    margin: 0;
+  }
+  
+  /* ── SUBTITLE ── */
+  .ev-err-sub {
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--tl);
+    line-height: 1.65;
+    font-weight: 300;
+    max-width: 320px;
+    margin-bottom: var(--sp-xs);
+  }
+  
+  /* ── ACTIONS ── */
+  .ev-err-actions {
+    display: flex;
+    gap: var(--sp-sm);
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: var(--sp-xs);
+  }
+  
+  /* ── FOOTER NOTE ── */
+  .ev-err-footer {
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: var(--tl);
+    text-align: center;
+  }
+  
+  /* ── RESPONSIVE ── */
+  @media (max-width: 400px) {
+    .ev-err-card {
+      padding: var(--sp-xl) var(--sp-md);
+    }
+  
+    .ev-err-code { font-size: 56px; }
+    .ev-err-title { font-size: 18px; }
+  
+    .ev-err-actions {
+      flex-direction: column;
+      width: 100%;
+    }
+  
+    .ev-err-actions .ev-btn,
+    .ev-err-actions .ev-btn-outline {
+      width: 100% !important;
+    }
+  }

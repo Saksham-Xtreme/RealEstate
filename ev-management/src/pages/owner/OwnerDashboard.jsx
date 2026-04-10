@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
 
 
 const BASE_URL = import.meta.env.VITE_SERVER_URL;
@@ -111,6 +113,8 @@ const EmployeeTable = ({ employees }) => {
 
 // ================= MAIN DASHBOARD =================
 const OwnerDashboard = () => {
+
+    const navigate = useNavigate();
   const [stats, setStats] = useState({
     totalUsers: 0,
     activeUsers: 0,
@@ -166,12 +170,12 @@ const OwnerDashboard = () => {
     <div className="p-6 bg-gray-50 min-h-screen">
 
       {/* HEADER */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Owner Dashboard</h1>
-        <button className="bg-black text-white px-4 py-2 rounded-lg">
-          Export Excel
+      <button
+        onClick={() => navigate("/owner/add-employee")}
+        className="bg-black text-white px-4 py-2 rounded"
+        >
+            Add Employee
         </button>
-      </div>
 
       {/* KPI CARDS */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">

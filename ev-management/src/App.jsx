@@ -6,6 +6,8 @@ import ListingDetail from "./pages/ListingDetail";
 import MyInterests from "./pages/MyInterests";
 import Authentication from "./pages/Authentication";
 
+import ErrorPage from "./pages/ErrorPage";
+
 // Employee
 import EmployeeDashboard from "./pages/Employee/EmployeeDashboard";
 import EmployeeLayout from "./layouts/EmployeeLayout";
@@ -13,6 +15,7 @@ import CreateListing from "./pages/Employee/CreateListing";
 import EditListing from "./pages/Employee/EditListing";
 // Owner
 import OwnerDashboard from "./pages/owner/OwnerDashboard";
+import AddEmployee from "./pages/owner/AddEmployee";
 
 // Auth
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -66,6 +69,15 @@ function App() {
           }
         />
 
+        <Route
+          path="/owner/add-employee"
+          element={
+            <ProtectedRoute allowedRoles={["owner"]}>
+              <AddEmployee />
+            </ProtectedRoute>
+          }
+        />
+
         {/* EMPLOYEE ROUTES (NESTED) */}
         <Route
           path="/employee"
@@ -81,7 +93,7 @@ function App() {
         </Route>
 
         {/* DEFAULT REDIRECT */}
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route path="*" element={<ErrorPage />} />
 
       </Routes>
     </Router>

@@ -86,6 +86,34 @@ const EmployeeDashboard = () => {
     });
   }, [leads]);
 
+  useEffect(() => {
+    const BASE_URL = import.meta.env.VITE_SERVER_URL;
+    const token = localStorage.getItem("token");
+  
+    console.log("Tracking started...");
+  
+    const interval = setInterval(async () => {
+      try {
+        await axios.post(
+          `${BASE_URL}/api/owner/track-employee`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+  
+        console.log("Tracking ping sent");
+  
+      } catch (err) {
+        console.error("Tracking failed", err);
+      }
+    }, 5000); // every 5 sec
+  
+    return () => clearInterval(interval);
+  }, []);
+
   /* FILTER + SORT */
   const filteredLeads = leads
     .filter((l) => filter === "ALL" || l.leadCategory === filter)
