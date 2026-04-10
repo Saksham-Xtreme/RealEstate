@@ -11,14 +11,25 @@ const EditListing = () => {
 
   useEffect(() => {
     const fetchListing = async () => {
-      const res = await axios.get(`${SERVER}/api/listings/${id}`);
-      setListing(res.data.listing);
+      try {
+        const res = await axios.get(`${SERVER}/api/listings/${id}`);
+
+        const listingData = res.data?.listing;
+
+        if (!listingData) return;
+
+        setListing(listingData);
+      } catch (err) {
+        console.error("Fetch error:", err.response || err);
+      }
     };
 
     fetchListing();
   }, [id]);
 
-  if (!listing) return <div>Loading...</div>;
+  if (!listing || !listing.title) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="p-6">

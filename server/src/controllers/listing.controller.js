@@ -137,6 +137,16 @@ const getMyListings = async (req, res) => {
   }
 };
 
+
+// helper
+const parseJSON = (data) => {
+  try {
+    return typeof data === "string" ? JSON.parse(data) : data;
+  } catch {
+    return {};
+  }
+};
+
 const updateListing = async (req, res) => {
   try {
     const { id } = req.params;
@@ -153,58 +163,131 @@ const updateListing = async (req, res) => {
       });
     }
 
-    // DEBUG
     console.log("BODY:", req.body);
-    console.log("USER:", req.user);
-    console.log("PARAMS:", req.params);
+    console.log("FILES:", req.files);
 
-    // SAFE UPDATE
+    // ─────────────────────────────
+    // BASIC FIELDS
+    // ─────────────────────────────
     listing.title = req.body.title ?? listing.title;
     listing.price = req.body.price ?? listing.price;
     listing.type = req.body.type ?? listing.type;
     listing.status = req.body.status ?? listing.status;
+    listing.description = req.body.description ?? listing.description;
+
+    // ─────────────────────────────
+    // PARSE NESTED JSON
+    // ─────────────────────────────
+    const location = parseJSON(req.body.location);
+    const configuration = parseJSON(req.body.configuration);
+    const area = parseJSON(req.body.area);
+    const details = parseJSON(req.body.details);
+    const nearby = parseJSON(req.body.nearby);
+    const amenities = parseJSON(req.body.amenities);
 
     if (req.body.location) {
       listing.location = {
         ...listing.location.toObject(),
-        ...req.body.location
+        ...location
       };
     }
 
     if (req.body.configuration) {
       listing.configuration = {
         ...listing.configuration.toObject(),
-        ...req.body.configuration
+        ...configuration
       };
     }
 
     if (req.body.area) {
       listing.area = {
         ...listing.area.toObject(),
-        ...req.body.area
+        ...area
       };
     }
 
     if (req.body.details) {
-      const cleanDetails = { ...req.body.details };
-    
-      // ❌ remove invalid enum values
+      const cleanDetails = { ...details };
+
       if (!cleanDetails.furnishing) delete cleanDetails.furnishing;
       if (!cleanDetails.ownership) delete cleanDetails.ownership;
-    
+
       listing.details = {
         ...listing.details.toObject(),
         ...cleanDetails
       };
     }
 
-    if (req.body.amenities) listing.amenities = req.body.amenities;
-    if (req.body.nearby) listing.nearby = req.body.nearby;
-    if (req.body.description) listing.description = req.body.description;
+    if (req.body.nearby) {
+      listing.nearby = nearby;
+    }
 
+    if (req.body.amenities) {
+      listing.amenities = amenities;
+    }
+
+    // ─────────────────────────────
+    // IMAGE HANDLING (CRITICAL)
+    // ─────────────────────────────
+
+    let existingImages = [];
+
+    if (req.body.existingImages) {
+      existingImages = Array.isArray(req.body.existingImages)
+        ? req.body.existingImages
+        : [req.body.existingImages];
+    }
+
+    // keep old images
+    const formattedExisting = existingImages.map((url) => ({
+      url,
+      publicId: null,
+      isPrimary: false
+    }));
+
+    // upload new images
+    let newImages = [];
+
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        const result = await cloudinary.uploader.upload(file.path, {
+          folder: "real-estate/listings"
+        });
+
+        newImages.push({
+          url: result.secure_url,
+          publicId: result.public_id,
+          isPrimary: false
+        });
+      }
+    }
+
+    // merge images
+    let finalImages = [...formattedExisting, ...newImages];
+
+    // set primary image
+    const primaryIndex = Number(req.body.primaryImageIndex);
+
+    if (!isNaN(primaryIndex) && finalImages[primaryIndex]) {
+      finalImages = finalImages.map((img, i) => ({
+        ...img,
+        isPrimary: i === primaryIndex
+      }));
+    } else if (finalImages.length > 0) {
+      finalImages[0].isPrimary = true;
+    }
+
+    if (finalImages.length > 0) {
+      listing.images = finalImages;
+    }
+
+    // ─────────────────────────────
     await listing.save();
 
-    res.json({ success: true, data: listing });
+    res.json({
+      success: true,
+      data: listing
+    });
 
   } catch (err) {
     console.error("UPDATE ERROR:", err);
@@ -215,6 +298,8 @@ const updateListing = async (req, res) => {
     });
   }
 };
+
+
 
 // 🔷 EXPORT
 module.exports = {

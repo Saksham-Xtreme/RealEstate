@@ -1,17 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import "../styles/navbar.css";
 
-const Navbar = ({ role = "user", onNav }) => {
+const Navbar = ({ onNav }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   const token = localStorage.getItem("token");
+  const user = JSON.parse(localStorage.getItem("user"));
+
   const isLoggedIn = !!token;
+  const role = user?.role || "guest";
 
   const isActive = (path) => location.pathname === path;
 
-  
   const handleNav = (path, hash = null) => {
     if (hash) onNav?.(hash);
     navigate(path);
@@ -20,19 +23,45 @@ const Navbar = ({ role = "user", onNav }) => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-  
-    // optional cleanup
     localStorage.removeItem("user");
-  
-    // navigate without reload
-    navigate("/auth");
+    navigate("/login");
   };
+
+  // 🔥 ROLE-BASED LINKS
+  const navLinks = useMemo(() => {
+    if (!isLoggedIn) {
+      return [
+        { label: "Home", path: "/" },
+      ];
+    }
+
+    if (role === "owner") {
+      return [
+        { label: "Dashboard", path: "/owner/dashboard" },
+        { label: "Add Employee", path: "/owner/add-employee" },
+      ];
+    }
+
+    if (role === "employee") {
+      return [
+        { label: "Dashboard", path: "/employee/home" },
+        { label: "Create Listing", path: "/employee/createListing" },
+      ];
+    }
+
+    // default user
+    return [
+      { label: "Home", path: "/" },
+      { label: "Listings", path: "/listings" },
+      { label: "My Interests", path: "/my-interests" },
+    ];
+  }, [role, isLoggedIn]);
 
   return (
     <nav className="ev-nav">
 
-      {/* ── LOGO ── */}
-      <div className="ev-nav-logo" onClick={() => handleNav("/", "ev-hero")}>
+      {/* LOGO */}
+      <div className="ev-nav-logo" onClick={() => handleNav("/")}>
         <div className="ev-nav-mark">
           <svg viewBox="0 0 24 24" fill="white">
             <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
@@ -41,54 +70,35 @@ const Navbar = ({ role = "user", onNav }) => {
         EV CRM
       </div>
 
-      {/* ── DESKTOP LINKS ── */}
+      {/* DESKTOP LINKS */}
       <ul className="ev-nav-links">
-        <li>
-          <a
-            href="#"
-            className={isActive("/") ? "ev-nav-active" : ""}
-            onClick={(e) => {
-              e.preventDefault();
-              handleNav("/", "ev-hero");
-            }}
-          >
-            Home
-          </a>
-        </li>
-        <li>
-          <Link to="/listings" className={isActive("/listings") ? "ev-nav-active" : ""}>
-            Listings
-          </Link>
-        </li>
-        <li>
-          <Link to="/my-interests" className={isActive("/my-interests") ? "ev-nav-active" : ""}>
-            My Interests
-          </Link>
-        </li>
-        {role === "owner" && (
-          <li>
-            <Link to="/admin" className={isActive("/admin") ? "ev-nav-active" : ""}>
-              Admin
+        {navLinks.map((link, i) => (
+          <li key={i}>
+            <Link
+              to={link.path}
+              className={isActive(link.path) ? "ev-nav-active" : ""}
+            >
+              {link.label}
             </Link>
           </li>
-        )}
+        ))}
       </ul>
 
-      {/* ── ACTIONS & MOBILE TOGGLE ── */}
+      {/* ACTIONS */}
       <div className="ev-nav-actions">
-      {isLoggedIn ? (
-            <button className="ev-nav-btn" onClick={handleLogout}>
-                Logout
-            </button>
-            ) : (
-            <button className="ev-nav-btn" onClick={() => handleNav("/auth")}>
-                Login
-            </button>
+        {isLoggedIn ? (
+          <button className="ev-nav-btn" onClick={handleLogout}>
+            Logout
+          </button>
+        ) : (
+          <button className="ev-nav-btn" onClick={() => handleNav("/login")}>
+            Login
+          </button>
         )}
 
-        {/* ── MOBILE HAMBURGER ── */}
-        <div 
-          className={`ev-nav-hamburger ${isMobileMenuOpen ? "ev-open" : ""}`} 
+        {/* MOBILE */}
+        <div
+          className={`ev-nav-hamburger ${isMobileMenuOpen ? "ev-open" : ""}`}
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
           <span></span>
@@ -97,29 +107,18 @@ const Navbar = ({ role = "user", onNav }) => {
         </div>
       </div>
 
-      {/* ── MOBILE DROPDOWN MENU ── */}
+      {/* MOBILE MENU */}
       <div className={`ev-nav-mobile-menu ${isMobileMenuOpen ? "ev-open" : ""}`}>
-        <a
-          href="#"
-          className={isActive("/") ? "ev-nav-active" : ""}
-          onClick={(e) => {
-            e.preventDefault();
-            handleNav("/", "ev-hero");
-          }}
-        >
-          Home
-        </a>
-        <Link to="/listings" className={isActive("/listings") ? "ev-nav-active" : ""} onClick={() => setIsMobileMenuOpen(false)}>
-          Listings
-        </Link>
-        <Link to="/my-interests" className={isActive("/my-interests") ? "ev-nav-active" : ""} onClick={() => setIsMobileMenuOpen(false)}>
-          My Interests
-        </Link>
-        {role === "owner" && (
-          <Link to="/admin" className={isActive("/admin") ? "ev-nav-active" : ""} onClick={() => setIsMobileMenuOpen(false)}>
-            Admin
+        {navLinks.map((link, i) => (
+          <Link
+            key={i}
+            to={link.path}
+            className={isActive(link.path) ? "ev-nav-active" : ""}
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            {link.label}
           </Link>
-        )}
+        ))}
       </div>
 
     </nav>

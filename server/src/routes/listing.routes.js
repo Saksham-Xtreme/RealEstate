@@ -40,6 +40,7 @@ router.put(
   "/:id",
   protect,
   authorize("employee"),
+  upload.array("images", 5), // ✅ REQUIRED
   updateListing
 );
 
