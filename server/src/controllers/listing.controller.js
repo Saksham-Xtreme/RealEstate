@@ -146,6 +146,17 @@ const parseJSON = (data) => {
     return {};
   }
 };
+// const Listing = require("../models/listing.model");
+// const cloudinary = require("../config/cloudinary");
+
+// // helper
+// const parseJSON = (data) => {
+//   try {
+//     return typeof data === "string" ? JSON.parse(data) : data;
+//   } catch {
+//     return {};
+//   }
+// };
 
 const updateListing = async (req, res) => {
   try {
@@ -163,50 +174,53 @@ const updateListing = async (req, res) => {
       });
     }
 
-    console.log("BODY:", req.body);
+    // 🔥 SAFE BODY
+    const body = req.body || {};
+
+    console.log("BODY:", body);
     console.log("FILES:", req.files);
 
     // ─────────────────────────────
     // BASIC FIELDS
     // ─────────────────────────────
-    listing.title = req.body.title ?? listing.title;
-    listing.price = req.body.price ?? listing.price;
-    listing.type = req.body.type ?? listing.type;
-    listing.status = req.body.status ?? listing.status;
-    listing.description = req.body.description ?? listing.description;
+    listing.title = body.title ?? listing.title;
+    listing.price = body.price ?? listing.price;
+    listing.type = body.type ?? listing.type;
+    listing.status = body.status ?? listing.status;
+    listing.description = body.description ?? listing.description;
 
     // ─────────────────────────────
-    // PARSE NESTED JSON
+    // PARSE JSON FIELDS
     // ─────────────────────────────
-    const location = parseJSON(req.body.location);
-    const configuration = parseJSON(req.body.configuration);
-    const area = parseJSON(req.body.area);
-    const details = parseJSON(req.body.details);
-    const nearby = parseJSON(req.body.nearby);
-    const amenities = parseJSON(req.body.amenities);
+    const location = parseJSON(body.location);
+    const configuration = parseJSON(body.configuration);
+    const area = parseJSON(body.area);
+    const details = parseJSON(body.details);
+    const nearby = parseJSON(body.nearby);
+    const amenities = parseJSON(body.amenities);
 
-    if (req.body.location) {
+    if (body.location) {
       listing.location = {
         ...listing.location.toObject(),
         ...location
       };
     }
 
-    if (req.body.configuration) {
+    if (body.configuration) {
       listing.configuration = {
         ...listing.configuration.toObject(),
         ...configuration
       };
     }
 
-    if (req.body.area) {
+    if (body.area) {
       listing.area = {
         ...listing.area.toObject(),
         ...area
       };
     }
 
-    if (req.body.details) {
+    if (body.details) {
       const cleanDetails = { ...details };
 
       if (!cleanDetails.furnishing) delete cleanDetails.furnishing;
@@ -218,24 +232,19 @@ const updateListing = async (req, res) => {
       };
     }
 
-    if (req.body.nearby) {
-      listing.nearby = nearby;
-    }
-
-    if (req.body.amenities) {
-      listing.amenities = amenities;
-    }
+    if (body.nearby) listing.nearby = nearby;
+    if (body.amenities) listing.amenities = amenities;
 
     // ─────────────────────────────
-    // IMAGE HANDLING (CRITICAL)
+    // IMAGE HANDLING
     // ─────────────────────────────
 
     let existingImages = [];
 
-    if (req.body.existingImages) {
-      existingImages = Array.isArray(req.body.existingImages)
-        ? req.body.existingImages
-        : [req.body.existingImages];
+    if (body.existingImages) {
+      existingImages = Array.isArray(body.existingImages)
+        ? body.existingImages
+        : [body.existingImages];
     }
 
     // keep old images
@@ -265,8 +274,8 @@ const updateListing = async (req, res) => {
     // merge images
     let finalImages = [...formattedExisting, ...newImages];
 
-    // set primary image
-    const primaryIndex = Number(req.body.primaryImageIndex);
+    // primary image
+    const primaryIndex = Number(body.primaryImageIndex);
 
     if (!isNaN(primaryIndex) && finalImages[primaryIndex]) {
       finalImages = finalImages.map((img, i) => ({
@@ -299,6 +308,7 @@ const updateListing = async (req, res) => {
   }
 };
 
+module.exports = { updateListing };
 
 
 // 🔷 EXPORT
