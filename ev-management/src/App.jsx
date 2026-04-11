@@ -16,7 +16,8 @@ import EditListing from "./pages/Employee/EditListing";
 // Owner
 import OwnerDashboard from "./pages/owner/OwnerDashboard";
 import AddEmployee from "./pages/owner/AddEmployee";
-
+import EmployeeDetail from "./pages/owner/EmployeeDetail";
+import EmployeesTable from "./pages/owner/EmployeesTable";
 // Auth
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -74,6 +75,24 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["owner"]}>
               <AddEmployee />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/owner/employee/:id"
+          element={
+            <ProtectedRoute allowedRoles={["owner"]}>
+              <EmployeeDetail />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/owner/employees"
+          element={
+            <ProtectedRoute allowedRoles={["owner"]}>
+              <EmployeesTable />
             </ProtectedRoute>
           }
         />

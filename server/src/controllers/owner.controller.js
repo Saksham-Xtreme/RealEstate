@@ -123,7 +123,7 @@ exports.getOwnerDashboard = async (req, res) => {
       console.error(err);
       res.status(500).json({ success: false });
     }
-  };
+};
 
 // ================= USER INSIGHTS =================
 exports.getUserInsights = async (req, res) => {
@@ -182,36 +182,56 @@ exports.getUserInsights = async (req, res) => {
 
 // ================= EMPLOYEE INSIGHTS =================
 exports.getEmployeeInsights = async (req, res) => {
-  try {
-    const employees = await Employee.find({}, "name phone").lean();
-
-    const pipeline = redis.pipeline();
-
-    employees.forEach((emp) => {
-      pipeline.get(`employee:session:${emp._id}`);
-    });
-
-    const results = await pipeline.exec();
-
-    const data = employees.map((emp, i) => {
-      const active = !!results[i][1];
-
-      return {
-        name: emp.name,
-        phone: emp.phone,
-        active,
-        status: active ? "Online" : "Offline",
-      };
-    });
-
-    res.json({ success: true, data });
-
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false });
-  }
+    try {
+      // 🔥 include email + lastLogin
+      const employees = await Employee.find(
+        {},
+        "name phone email lastLogin"
+      ).lean();
+  
+      const pipeline = redis.pipeline();
+  
+      employees.forEach((emp) => {
+        pipeline.get(`employee:session:${emp._id}`);
+      });
+  
+      const results = await pipeline.exec();
+  
+      const data = employees.map((emp, i) => {
+        const activeTime = Number(results[i][1] || 0);
+  
+        // 🔥 smarter status
+        let status = "Offline";
+        if (activeTime > 60) status = "Active";
+        else if (activeTime > 0) status = "Idle";
+  
+        return {
+          _id: emp._id,
+          name: emp.name,
+          email: emp.email,
+          phone: emp.phone,
+  
+          lastLogin: emp.lastLogin,
+  
+          // activity
+          activeTime,
+          status,
+  
+          // optional quick score
+          performanceScore: activeTime,
+        };
+      });
+  
+      res.json({
+        success: true,
+        data,
+      });
+  
+    } catch (err) {
+      console.error("EMPLOYEE INSIGHTS ERROR:", err);
+      res.status(500).json({ success: false });
+    }
 };
-
 
 
 exports.addEmployee = async (req, res) => {
@@ -247,3 +267,53 @@ exports.addEmployee = async (req, res) => {
     res.status(500).json({ success: false });
   }
 };
+
+exports.getEmployeeDetail = async (req, res) => {
+    try {
+      const { id } = req.params;
+  
+      // 🔥 get employee
+      const employee = await Employee.findById(id).lean();
+  
+      if (!employee) {
+        return res.status(404).json({
+          success: false,
+          message: "Employee not found",
+        });
+      }
+  
+      // 🔥 get active time from Redis
+      const activeTime = Number(
+        (await redis.get(`employee:session:${id}`)) || 0
+      );
+  
+      // 🔥 status logic
+      const status = activeTime > 60 ? "Active" : "Idle";
+  
+      // 🔥 get leads assigned
+      const leadsAssigned = await User.countDocuments({
+        assignedTo: id,
+      });
+  
+      res.json({
+        success: true,
+        data: {
+          _id: employee._id,
+          name: employee.name,
+          email: employee.email,
+          phone: employee.phone,
+          lastLogin: employee.lastLogin,
+          isActive: employee.isActive,
+  
+          // performance
+          activeTime,
+          status,
+          leadsAssigned,
+        },
+      });
+  
+    } catch (err) {
+      console.error("EMPLOYEE DETAIL ERROR:", err);
+      res.status(500).json({ success: false });
+    }
+  };

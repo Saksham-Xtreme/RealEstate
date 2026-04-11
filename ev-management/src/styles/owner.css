@@ -1,0 +1,420 @@
+/* ═══════════════════════════════════════════════════════════
+   OWNER PAGES — shared styles
+   Used by: OwnerDashboard, EmployeesTable,
+            EmployeeDetail, AddEmployee
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── PAGE SHELL ── */
+.ev-ow-page {
+    background: var(--off);
+    min-height: 100vh;
+    padding: var(--sp-lg) var(--sp-md);
+  }
+  
+  @media (min-width: 600px)  { .ev-ow-page { padding: var(--sp-xl) var(--sp-lg); } }
+  @media (min-width: 900px)  { .ev-ow-page { padding: var(--sp-xl) var(--sp-2xl); } }
+  @media (min-width: 1200px) { .ev-ow-page { padding: var(--sp-xl) 56px; } }
+  
+  /* ── PAGE HEADER ── */
+  .ev-ow-page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--sp-lg);
+    flex-wrap: wrap;
+    margin-bottom: var(--sp-xl);
+  }
+  
+  .ev-ow-page-title {
+    font-family: var(--font-head);
+    font-size: clamp(22px, 5vw, 32px);
+    font-weight: 800;
+    color: var(--td);
+    letter-spacing: -0.5px;
+    margin: 4px 0 2px;
+  }
+  
+  .ev-ow-page-sub {
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--tl);
+    font-weight: 300;
+  }
+  
+  /* ── BACK BUTTON ── */
+  .ev-ow-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-head);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--tl);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.2s;
+  }
+  .ev-ow-back-btn:hover { color: var(--b600); }
+  
+  /* ── KPI GRID ── */
+  .ev-ow-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--sp-sm);
+    margin-bottom: var(--sp-xl);
+  }
+  
+  @media (min-width: 480px) { .ev-ow-kpi-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (min-width: 700px) { .ev-ow-kpi-grid { grid-template-columns: repeat(4, 1fr); } }
+  @media (min-width: 900px) { .ev-ow-kpi-grid { grid-template-columns: repeat(7, 1fr); } }
+  
+  .ev-ow-kpi {
+    background: var(--white);
+    border: 1px solid var(--bdr);
+    border-radius: 12px;
+    padding: var(--sp-md);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .ev-ow-kpi::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--b200);
+    border-radius: 12px 12px 0 0;
+  }
+  
+  .ev-ow-kpi--active::before  { background: #22c55e; }
+  .ev-ow-kpi--high::before    { background: #ef4444; }
+  .ev-ow-kpi--medium::before  { background: #f59e0b; }
+  .ev-ow-kpi--low::before     { background: #3b82f6; }
+  
+  .ev-ow-kpi-value {
+    font-family: var(--font-head);
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--td);
+    letter-spacing: -1px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  
+  @media (min-width: 600px) { .ev-ow-kpi-value { font-size: 34px; } }
+  
+  .ev-ow-kpi--active .ev-ow-kpi-value  { color: #16a34a; }
+  .ev-ow-kpi--high .ev-ow-kpi-value    { color: #dc2626; }
+  .ev-ow-kpi--medium .ev-ow-kpi-value  { color: #d97706; }
+  
+  .ev-ow-kpi-label {
+    font-family: var(--font-body);
+    font-size: 11px;
+    color: var(--tl);
+    line-height: 1.3;
+  }
+  
+  /* ── TABLES GRID ── */
+  .ev-ow-tables-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--sp-md);
+  }
+  @media (min-width: 900px) {
+    .ev-ow-tables-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  
+  /* ── CARD ── */
+  .ev-ow-card {
+    background: var(--white);
+    border: 1px solid var(--bdr);
+    border-radius: 14px;
+    padding: var(--sp-lg);
+    overflow: hidden;
+  }
+  
+  .ev-ow-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--sp-md);
+    padding-bottom: var(--sp-md);
+    border-bottom: 1px solid var(--bdr);
+  }
+  
+  .ev-ow-card-title {
+    font-family: var(--font-head);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--td);
+  }
+  
+  .ev-ow-card-count {
+    font-family: var(--font-head);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--b600);
+    background: var(--b50);
+    border: 1px solid var(--b100);
+    padding: 3px 10px;
+    border-radius: 100px;
+  }
+  
+  /* ── TABLE ── */
+  .ev-ow-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .ev-ow-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-body);
+    font-size: 13px;
+    min-width: 420px;
+  }
+  
+  .ev-ow-table thead tr {
+    background: var(--off);
+    border-bottom: 1px solid var(--bdr);
+  }
+  
+  .ev-ow-table th {
+    font-family: var(--font-head);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--tl);
+    padding: 10px 14px;
+    text-align: left;
+    white-space: nowrap;
+  }
+  
+  .ev-ow-table td {
+    padding: 12px 14px;
+    color: var(--tm);
+    border-bottom: 1px solid var(--bdr);
+    vertical-align: middle;
+  }
+  
+  .ev-ow-table tbody tr:last-child td { border-bottom: none; }
+  
+  .ev-ow-table tbody tr:hover { background: var(--b50); }
+  
+  .ev-ow-row-clickable { cursor: pointer; }
+  
+  .ev-ow-table-empty {
+    text-align: center;
+    padding: 40px !important;
+    color: var(--tl);
+    font-style: italic;
+  }
+  
+  /* ── USER CELL ── */
+  .ev-ow-user-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .ev-ow-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--b50);
+    border: 1px solid var(--b100);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-head);
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--b600);
+    flex-shrink: 0;
+  }
+  
+  .ev-ow-user-name {
+    font-family: var(--font-head);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--td);
+  }
+  
+  .ev-ow-user-email {
+    font-size: 11px;
+    color: var(--tl);
+    margin-top: 1px;
+  }
+  
+  .ev-ow-score {
+    font-family: var(--font-head);
+    font-weight: 700;
+    color: var(--td) !important;
+    text-align: center;
+  }
+  
+  /* ── BADGES ── */
+  .ev-ow-badge {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--font-head);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 100px;
+  }
+  
+  .ev-ow-badge--high   { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
+  .ev-ow-badge--medium { background: #fef9c3; color: #ca8a04; border: 1px solid #fde68a; }
+  .ev-ow-badge--low    { background: #dbeafe; color: #2563eb; border: 1px solid #bfdbfe; }
+  
+  /* ── STATUS ── */
+  .ev-ow-status {
+    font-family: var(--font-head);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 100px;
+    display: inline-block;
+  }
+  
+  .ev-ow-status--active { background: #dcfce7; color: #16a34a; border: 1px solid #bbf7d0; }
+  .ev-ow-status--idle   { background: var(--off); color: var(--tl); border: 1px solid var(--bdr); }
+  
+  /* ── VIEW BUTTON ── */
+  .ev-ow-view-btn {
+    font-family: var(--font-head);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--b600);
+    background: var(--b50);
+    border: 1px solid var(--b100);
+    padding: 5px 12px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    white-space: nowrap;
+  }
+  
+  .ev-ow-view-btn:hover {
+    background: var(--b600);
+    color: var(--white);
+    border-color: var(--b600);
+  }
+  
+  /* ── DETAIL LAYOUT ── */
+  .ev-ow-detail-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--sp-md);
+    max-width: 860px;
+  }
+  
+  @media (min-width: 600px) {
+    .ev-ow-detail-layout { grid-template-columns: 220px 1fr; align-items: start; }
+  }
+  
+  /* ── PROFILE CARD ── */
+  .ev-ow-profile-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sp-sm);
+    text-align: center;
+  }
+  
+  .ev-ow-profile-avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: var(--b50);
+    border: 2px solid var(--b100);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-head);
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--b600);
+    margin-bottom: var(--sp-xs);
+  }
+  
+  .ev-ow-profile-name {
+    font-family: var(--font-head);
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--td);
+  }
+  
+  .ev-ow-profile-role {
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: var(--tl);
+  }
+  
+  /* ── DETAIL ROWS ── */
+  .ev-ow-detail-card { padding: var(--sp-lg); }
+  
+  .ev-ow-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--bdr);
+    gap: var(--sp-md);
+  }
+  
+  .ev-ow-detail-row:last-child { border-bottom: none; }
+  
+  .ev-ow-detail-label {
+    font-family: var(--font-head);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--tl);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+  }
+  
+  .ev-ow-detail-value {
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--td);
+    text-align: right;
+  }
+  
+  /* ── ADD EMPLOYEE FORM CARD ── */
+  .ev-ow-form-card {
+    max-width: 480px;
+  }
+  
+  /* ── LOADING ── */
+  .ev-ow-loading {
+    min-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sp-md);
+    color: var(--tl);
+    font-family: var(--font-body);
+    font-size: 14px;
+  }
+  
+  .ev-ow-spinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid var(--b100);
+    border-top-color: var(--b600);
+    border-radius: 50%;
+    animation: ev-ow-spin 0.8s linear infinite;
+  }
+  
+  @keyframes ev-ow-spin { to { transform: rotate(360deg); } }

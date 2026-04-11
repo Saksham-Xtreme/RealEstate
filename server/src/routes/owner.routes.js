@@ -6,6 +6,7 @@ const {
   getUserInsights,
   getEmployeeInsights,
   addEmployee,
+  getEmployeeDetail,
 } = require("../controllers/owner.controller");
 
 const { protect } = require("../middlewares/auth.middleware");
@@ -52,4 +53,11 @@ router.post("/track-employee", protect, async (req, res) => {
       res.status(500).json({ success: false });
     }
 });
+
+router.get(
+    "/employee/:id",
+    protect,
+    isOwner,
+    getEmployeeDetail
+);
 module.exports = router;
