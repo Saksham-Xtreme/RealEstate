@@ -78,6 +78,15 @@ The system follows a **modular monolith architecture with service separation pri
 
 ---
 
+## Directory Structure
+
+This repository is organized into two main workspaces:
+
+* **[ev-management/](file:///Users/sakshamtripathi/Desktop/Real%20Estate/ev-management)** - React & Vite frontend application for managing listings, employee sessions, and visitor engagement tracking.
+* **[server/](file:///Users/sakshamtripathi/Desktop/Real%20Estate/server)** - Express and Node.js backend handling API requests, business logic, MongoDB storage, and Redis session tracking.
+
+---
+
 ## Tech Stack
 
 ### Frontend
@@ -129,12 +138,12 @@ The system follows a **modular monolith architecture with service separation pri
 2. Install dependencies:
 
    ```bash
-   cd frontend && npm install
-   cd ../backend && npm install
+   cd ev-management && npm install
+   cd ../server && npm install
    ```
 
 3. Configure environment variables:
-   Create `.env` in backend:
+   Create `.env` in the `server` directory:
 
    ```
    MONGO_URI=your_mongodb_url
@@ -142,10 +151,16 @@ The system follows a **modular monolith architecture with service separation pri
    JWT_SECRET=your_secret
    ```
 
-4. Run project:
+4. Run the project:
 
+   **Backend (Server):**
    ```bash
-   npm start
+   cd server && npm run dev
+   ```
+
+   **Frontend (EV Management):**
+   ```bash
+   cd ev-management && npm run dev
    ```
 
 ---

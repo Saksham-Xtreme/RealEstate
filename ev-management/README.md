@@ -1,16 +1,45 @@
-# React + Vite
+# Frontend Application (EV Management)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This directory contains the React + Vite frontend workspace for the **RealEstate CRM + Analytics Platform**. It is responsible for rendering the UI, capturing user interaction metrics (used for lead scoring), and reporting employee active sessions to the backend.
 
-Currently, two official plugins are available:
+## Folder Directory Structure
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+* **[public/](file:///Users/sakshamtripathi/Desktop/Real%20Estate/ev-management/public)**: Static assets, icons, and logo images.
+* **[src/](file:///Users/sakshamtripathi/Desktop/Real%20Estate/ev-management/src)**: The main source code directory of the React application.
+  * **[assets/](file:///Users/sakshamtripathi/Desktop/Real%20Estate/ev-management/src/assets)**: Images, font files, and icons imported directly into React components.
+  * **[auth/](file:///Users/sakshamtripathi/Desktop/Real%20Estate/ev-management/src/auth)**: Contexts, hooks, and helpers related to user authorization and state.
+  * **[components/](file:///Users/sakshamtripathi/Desktop/Real%20Estate/ev-management/src/components)**: Reusable UI components (Navbar, Footer, Hero, Route Protectors, Forms).
+  * **[hooks/](file:///Users/sakshamtripathi/Desktop/Real%20Estate/ev-management/src/hooks)**: Custom React hooks (e.g., tracking idle state, fetching metrics, managing intervals).
+  * **[layouts/](file:///Users/sakshamtripathi/Desktop/Real%20Estate/ev-management/src/layouts)**: Layout components defining page shells (e.g., Sidebar setups, Dashboard wraps).
+  * **[pages/](file:///Users/sakshamtripathi/Desktop/Real%20Estate/ev-management/src/pages)**: Core views (Auth forms, Home, Listing directory, Detail page, Owner console, Employee tracking portal).
+  * **[styles/](file:///Users/sakshamtripathi/Desktop/Real%20Estate/ev-management/src/styles)**: Custom styling definitions.
+  * **[utils/](file:///Users/sakshamtripathi/Desktop/Real%20Estate/ev-management/src/utils)**: Utility helper functions, validators, formatting helpers, and Axios instance configurations.
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Technical Stack & Libraries
 
-## Expanding the ESLint configuration
+- **Vite** - High-performance build tool and dev server.
+- **React Router DOM** - Client-side declarative routing.
+- **Axios** - HTTP client for interacting with the backend APIs.
+- **Tailwind CSS** - Utility-first styling framework.
+- **Lucide React** - Vector icons for modern visual aesthetics.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## Getting Started
+
+1. Ensure packages are installed:
+   ```bash
+   npm install
+   ```
+
+2. Start the hot-reloading development server:
+   ```bash
+   npm run dev
+   ```
+
+3. Build for production:
+   ```bash
+   npm run build
+   ```
