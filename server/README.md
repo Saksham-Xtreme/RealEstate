@@ -24,6 +24,7 @@ This directory contains the Node.js + Express backend for the **RealEstate CRM +
 - **Redis** - High-speed in-memory database used for tracking real-time employee sessions (Active/Idle/Offline).
 - **jsonwebtoken** - Sign and verify user tokens for stateless backend sessions.
 - **Cloudinary** - Media management service for hosting property pictures.
+- **Message Central CPaaS API** - External SMS gateway integration for sending and validating OTPs (passwordless auth).
 
 ---
 
@@ -43,6 +44,9 @@ This directory contains the Node.js + Express backend for the **RealEstate CRM +
    CLOUDINARY_CLOUD_NAME=your_name
    CLOUDINARY_API_KEY=your_key
    CLOUDINARY_API_SECRET=your_secret
+   MC_CUSTOMER_ID=your_message_central_customer_id
+   MC_EMAIL=your_message_central_email
+   MC_PASSWORD=your_message_central_password
    ```
 
 3. Run in development mode with live reload:

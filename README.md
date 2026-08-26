@@ -65,6 +65,14 @@ The system is designed to go beyond basic listing platforms by providing **data-
   * Leads assigned (MongoDB)
 * Enables ranking and monitoring
 
+### 4. Passwordless OTP Verification (Message Central)
+
+* Integrates **Message Central CPaaS API** for SMS-based verification.
+* Normalizes phone numbers automatically for Indian regional formats (`+91`).
+* Features cached auth token management using Redis (1-hour expiration).
+* Tracks validation sessions using temporary verification IDs stored in Redis (5-minute TTL).
+* Implements automatic signup or login upon successful validation.
+
 ---
 
 ## Architecture
@@ -108,6 +116,7 @@ This repository is organized into two main workspaces:
 ### Authentication
 
 * JWT-based authentication system
+* Message Central OTP SMS-based verification (passwordless signup/login)
 
 ### Deployment
 
@@ -149,6 +158,9 @@ This repository is organized into two main workspaces:
    MONGO_URI=your_mongodb_url
    REDIS_URL=your_redis_url
    JWT_SECRET=your_secret
+   MC_CUSTOMER_ID=your_message_central_customer_id
+   MC_EMAIL=your_message_central_email
+   MC_PASSWORD=your_message_central_password
    ```
 
 4. Run the project:
