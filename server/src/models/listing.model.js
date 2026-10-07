@@ -99,6 +99,55 @@ const listingSchema = new mongoose.Schema({
     index: true
   },
 
+  // 🔷 ARCHIVE INFORMATION
+  archive: {
+    isArchived: {
+      type: Boolean,
+      default: false,
+      index: true
+    },
+
+    archivedAt: {
+      type: Date,
+      default: null
+    },
+
+    archivedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null
+    },
+
+    archivedByName: {
+      type: String,
+      default: null
+    },
+
+    archivedByRole: {
+      type: String,
+      enum: ["owner", "employee"],
+      default: null
+    },
+
+    reason: {
+      type: String,
+      trim: true,
+      default: null
+    },
+
+    // Relevant when an employee archives a listing
+    soldThrough: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null
+    },
+
+    soldThroughName: {
+      type: String,
+      default: null
+    }
+  },
+
   // 🔷 CREATED BY
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
