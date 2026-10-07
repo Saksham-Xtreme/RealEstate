@@ -480,22 +480,44 @@ const Authentication = () => {
 
   /* ── REGISTER (users only) ── */
   const handleRegister = async () => {
-    if (phone.length !== 10) return setError("Enter a valid 10-digit phone number.");
-    if (!password)           return setError("Password is required.");
-    if (!name.trim())        return setError("Name is required.");
-    setError(""); setLoading(true);
-
+    if (phone.length !== 10)
+      return setError("Enter a valid 10-digit phone number.");
+  
+    if (!password)
+      return setError("Password is required.");
+  
+    if (!name.trim())
+      return setError("Name is required.");
+  
+    setError("");
+    setLoading(true);
+  
     try {
-      const res  = await fetch(`${SERVER}/api/auth/register`, {
+      const res = await fetch(`${SERVER}/api/auth/signup`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, password, name, email, city }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          phone,
+          password,
+          name,
+          email,
+          city,
+        }),
       });
+  
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Registration failed");
+  
+      if (!res.ok) {
+        throw new Error(data.message || "Registration failed");
+      }
+  
       localStorage.setItem("token", data.token);
-      localStorage.setItem("user",  JSON.stringify(data.user));
+      localStorage.setItem("user", JSON.stringify(data.user));
+  
       navigate("/listings");
+  
     } catch (e) {
       setError(e.message);
     } finally {
