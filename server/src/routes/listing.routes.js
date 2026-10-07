@@ -7,12 +7,18 @@ const {
   getListingById,
   getMyListings,
   updateListing,
+  archiveListing,
+  restoreListing,
 } = require("../controllers/listing.controller");
 
-const { protect, authorize } = require("../middlewares/auth.middleware");
+const {
+  protect,
+  authorize
+} = require("../middlewares/auth.middleware");
 
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
+
 
 // 🔷 CREATE (EMPLOYEE ONLY)
 router.post(
@@ -23,6 +29,7 @@ router.post(
   createListing
 );
 
+
 // 🔷 GET MY LISTINGS
 router.get(
   "/my",
@@ -31,17 +38,38 @@ router.get(
   getMyListings
 );
 
+
+// 🔷 ARCHIVE LISTING (OWNER + EMPLOYEE)
+router.patch(
+  "/:id/archive",
+  protect,
+  authorize("owner", "employee"),
+  archiveListing
+);
+
+
+// 🔷 RESTORE LISTING (OWNER + EMPLOYEE)
+router.patch(
+  "/:id/restore",
+  protect,
+  authorize("owner", "employee"),
+  restoreListing
+);
+
+
 // 🔷 PUBLIC
 router.get("/", getListings);
 router.get("/:id", getListingById);
 
-// edit
+
+// 🔷 EDIT (EMPLOYEE ONLY)
 router.put(
   "/:id",
   protect,
   authorize("employee"),
-  upload.array("images", 5), // ✅ REQUIRED
+  upload.array("images", 5),
   updateListing
 );
+
 
 module.exports = router;

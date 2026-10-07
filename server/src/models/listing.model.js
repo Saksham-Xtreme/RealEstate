@@ -113,9 +113,16 @@ const listingSchema = new mongoose.Schema({
     },
 
     archivedBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      default: null
+      id: {
+        type: mongoose.Schema.Types.ObjectId,
+        default: null
+      },
+
+      type: {
+        type: String,
+        enum: ["User", "Employee"],
+        default: null
+      }
     },
 
     archivedByName: {
@@ -135,11 +142,18 @@ const listingSchema = new mongoose.Schema({
       default: null
     },
 
-    // Relevant when an employee archives a listing
+    // Employee who handled the sale
     soldThrough: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      default: null
+      id: {
+        type: mongoose.Schema.Types.ObjectId,
+        default: null
+      },
+
+      type: {
+        type: String,
+        enum: ["User", "Employee"],
+        default: null
+      }
     },
 
     soldThroughName: {
