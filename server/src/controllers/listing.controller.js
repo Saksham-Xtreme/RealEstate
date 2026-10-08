@@ -73,7 +73,10 @@ const getListings = async (req, res) => {
 
     const query = {
       status: "active",
-      "archive.isArchived": false,
+      $or: [
+        { "archive.isArchived": false },
+        { "archive.isArchived": { $exists: false } },
+      ],
     };
 
     if (city) {
@@ -148,7 +151,10 @@ const getListingById = async (req, res) => {
     const listing = await Listing.findOne({
       _id: req.params.id,
       status: "active",
-      "archive.isArchived": false,
+      $or: [
+        { "archive.isArchived": false },
+        { "archive.isArchived": { $exists: false } },
+      ],
     }).populate(
       "society",
       "name location"
